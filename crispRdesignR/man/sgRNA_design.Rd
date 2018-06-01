@@ -6,7 +6,7 @@
 sgRNA_design returns information to design sgRNA sequences based on a given target sequence, a genome to annotate off-target information, and a genome annoation file (.gtf), to annotate the off-target findings.
 }
 \usage{
-sgRNA_design(usersequence, genomename, gtfname)
+sgRNA_design(userseq, genomename, gtfname, calloffs = TRUE, annotateoffs = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -17,6 +17,10 @@ sgRNA_design(usersequence, genomename, gtfname)
     The name of a geneome (from the BSgenome package) to check off-targets for.
   }
   \item{gtfname}{The name of a genome annotation file (.gtf) in the working directory to check off-target sequences against.
+  }
+  \item{calloffs}{If TRUE, the function will search for off-targets in the genome chosen specified by the genomename argument. If FALSE, off-target calling will be skipped.
+  }
+  \item{annotateoffs}{If TRUE, the function will provide annotations for the off-targets called using the genome annotation file specified by the gtfname argument. If FALSE, off-target annotation will be skipped.
   }
 }
 \details{
@@ -45,9 +49,11 @@ Important Note: When designing sgRNA for large genomes (billions of base pairs),
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-alldata <- sgRNA_design("GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGGCCTATGTGAGTTTTTGAAGGGGGTTCAAAGCGCCTTGTAA", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz")
+alldata <- sgRNA_design("GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz")
 
 alldata <- sgRNA_design("DAK1.fasta", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz")
+
+alldata <- sgRNA_design("DAK1.fasta", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz", calloffs = TRUE, annotateoffs = FALSE)
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
