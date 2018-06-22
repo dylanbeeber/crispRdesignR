@@ -206,6 +206,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
       off_chr <- c()
       off_mismatch <- c()
       for (seqname in seqnames) {
+        print(paste("Checking for Off-Targets in", seqname, sep = " "))
         chrmm0_list <- c()
         chrmm1_list <- c()
         chrmm2_list <- c()
@@ -295,6 +296,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
         }
       }
       ## Calculates off-target scores for each off target sequence
+      print("annotating off-targets")
       CFD_Model_Scores <- read.csv("CFD_Scoring.csv")
       off_model_PAMs <- c("AG", "CG", "GA", "GC", "GT", "TG")
       CFD_PAM_Scores <- data.frame(off_model_PAMs, c(0.259259, 0.107142, 0.069444, 0.022222, 0.016129, 0.038961))
