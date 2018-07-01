@@ -2,9 +2,15 @@
 ## a gtf file to annotate the offtargets)
 
 sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotateoffs = TRUE){
-  if (isTRUE(str_detect(userseq, ".fasta"))){
-    Biostrings_sequence <- import(userseq)
-    sequence <- as.character(Biostrings_sequence)
+  if (isTRUE(str_detect(userseq, ".fasta")) || (isTRUE(str_detect(userseq, ".txt")))) {
+    if (isTRUE(class(try(import(userseq, format = "fasta"))) == "DNAStringSet")) {
+      Biostrings_sequence <- import(userseq, format = "fasta")
+      sequence <- as.character(Biostrings_sequence)
+    } else {
+      sequence <- read.table(userseq)
+      sequence <- paste(sequence[1:nrow(sequence), 1], collapse = "")
+      Biostrings_sequence <- DNAString(sequence)
+    }
   } else {
     sequence <- paste(userseq, collapse = "")
     sequence <- str_replace_all(sequence, fixed(" "), "")
