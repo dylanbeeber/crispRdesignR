@@ -195,6 +195,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
         DNAString(seqlist)
       }
       Biostrings_sgRNA <- lapply(sgRNA_with_PAM, multiple_DNAString)
+      Off_targ_Bio_sgRNA <- Biostrings_sgRNA
       ## Define genome
       usegenome <- genomename
       seqnames <- seqnames(usegenome)
@@ -211,6 +212,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
       off_offseq <- c()
       off_chr <- c()
       off_mismatch <- c()
+      PAM_test_list <- c("GG", "AG", "CG", "GA", "GC", "GT", "TG")
       for (seqname in seqnames) {
         print(paste("Checking for Off-Targets in", seqname, sep = " "))
         chrmm0_list <- c()
@@ -223,33 +225,38 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
         revchrmm2_list <- c()
         revchrmm3_list <- c()
         revchrmm4_list <- c()
-        for (pattern in Biostrings_sgRNA) {
+        for (pattern in Off_targ_Bio_sgRNA) {
+          usepattern <- replaceLetterAt(pattern, 21, "N")
           subject <- usegenome[[seqname]]
-          off_info <- matchPattern(pattern, subject, max.mismatch = 4, min.mismatch = 0)
-          mis_info <- mismatch(pattern, off_info)
-          rev_pattern <- reverseComplement(pattern)
-          rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0)
-          rev_mis_info <- mismatch(rev_pattern, rev_off_info)
+          off_info <- matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = FALSE)
+          mis_info <- mismatch(usepattern, off_info, fixed = FALSE)
+          rev_pattern <- reverseComplement(usepattern)
+          rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = FALSE)
+          rev_mis_info <- mismatch(rev_pattern, rev_off_info, fixed = FALSE)
           if (length(off_info) > 0) {
             for (f in 1:length(off_info)) {
-              off_start[[length(off_start)+1]] <- start(off_info)[f]
-              off_end[[length(off_end)+1]] <- end(off_info)[f]
-              off_direction[[length(off_direction)+1]] <- "+"
-              off_chr[[length(off_chr)+1]] <- seqname
-              off_mismatch[[length(off_mismatch)+1]] <- length(mis_info[[f]])
-              off_sgRNAseq[[length(off_sgRNAseq)+1]] <- as.character(pattern)
-              off_offseq[[length(off_offseq)+1]] <- as.character(off_info[[f]])
+              if (substr(as.character(off_info[[f]]), 22, 23) %in% PAM_test_list) {
+                off_start[[length(off_start)+1]] <- start(off_info)[f]
+                off_end[[length(off_end)+1]] <- end(off_info)[f]
+                off_direction[[length(off_direction)+1]] <- "+"
+                off_chr[[length(off_chr)+1]] <- seqname
+                off_mismatch[[length(off_mismatch)+1]] <- length(mis_info[[f]])
+                off_sgRNAseq[[length(off_sgRNAseq)+1]] <- as.character(pattern)
+                off_offseq[[length(off_offseq)+1]] <- as.character(off_info[[f]])
+              }
             }
           }
           if (length(rev_off_info) > 0) {
             for (f in 1:length(rev_off_info)) {
-              off_start[[length(off_start)+1]] <- start(rev_off_info)[f]
-              off_end[[length(off_end)+1]] <- end(rev_off_info)[f]
-              off_direction[[length(off_direction)+1]] <- "-"
-              off_chr[[length(off_chr)+1]] <- seqname
-              off_mismatch[[length(off_mismatch)+1]] <- length(rev_mis_info[[f]])
-              off_sgRNAseq[[length(off_sgRNAseq)+1]] <- as.character(pattern)
-              off_offseq[[length(off_offseq)+1]] <- as.character(rev_off_info[[f]])
+              if (substr(as.character(rev_off_info[[f]]), 22, 23) %in% PAM_test_list) {
+                off_start[[length(off_start)+1]] <- start(rev_off_info)[f]
+                off_end[[length(off_end)+1]] <- end(rev_off_info)[f]
+                off_direction[[length(off_direction)+1]] <- "-"
+                off_chr[[length(off_chr)+1]] <- seqname
+                off_mismatch[[length(off_mismatch)+1]] <- length(rev_mis_info[[f]])
+                off_sgRNAseq[[length(off_sgRNAseq)+1]] <- as.character(pattern)
+                off_offseq[[length(off_offseq)+1]] <- as.character(rev_off_info[[f]])
+              }
             }
           }
           individMM <- c()
