@@ -1,3 +1,3 @@
 getofftargetdata <- function(alldata){
-  data.frame(alldata[15:26])
+  data.frame(alldata[16:27])
 }
