@@ -12,10 +12,17 @@ Doench_Model_Weights_Singleonly.csv and Doench_Model_Weights_Doubleonly.csv - Tw
 
 CFD_Scoring.csv - A data table that contains the information used to calculate the off-target effects of off-target sequences.
 
-crispRdesignR dependencies:
+# Dependencies
 The stringr package: `install.packages("stringr", repos='http://cran.us.r-project.org')`
 
 The BioStrings and BSgenome packages through Bioconductor: `source("https://bioconductor.org/biocLite.R")`
-`biocLite("Biostrings", "BSgenome", "BSgenome.Hsapiens.UCSC.hg19", "AnnotationHub")` The user may choose to download other genomes and use them with the crispRdesignR package.
+Then: `biocLite("Biostrings", "BSgenome", "BSgenome.Hsapiens.UCSC.hg19", "AnnotationHub")` The user may choose to download other genomes and use them with the crispRdesignR package.
+
+Devtools (to install directly from github): `install.packages("devtools")`
+Then ensure you have a working development environment: https://www.r-project.org/nosvn/pandoc/devtools.html
+To install crispRdesignR: `install_github(dylanbeeber/crispRdesignR)`
 
 # Usage
+`library(crispRdesignR)`
+
+A single command can generate all of the data needed to choose the 
