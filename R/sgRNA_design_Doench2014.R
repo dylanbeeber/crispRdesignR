@@ -41,32 +41,29 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
   ## will describe as a possible sgRNA. Even though most sgRNA is
   ## only 20 nucleotides long, nucleotides surrounding the sgRNA
   ## are used for study-based scoring
-  PAM <- ".........................GG..."
-  ## Sets n to zero, which is used to incrementally increase
-  ## and search for all possible sgRNA in the sequence
-  n <- 0
+  setPAM <- "NGG"
+  usesetPAM <- str_replace(setPAM, "N", ".")
+  lengthpostPAM <- (6 - nchar(usesetPAM))
+  PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
   ## Searches all 23 nt streches in the sequence for
   ## possible matches to the PAM, then puts entire 30 nt
   ## matches into a list (including the PAM)
-  for (x in 0:num_char_in_seq){
-    poss_sgRNA <- substr(sequence, 1+n, 30+n)
+  for (x in 1:num_char_in_seq){
+    poss_sgRNA <- substr(sequence, x, 29+x)
     if (str_detect(poss_sgRNA, PAM) == TRUE){
       sgRNA_list_f[[length(sgRNA_list_f)+1]] <- poss_sgRNA
-      sgRNA_f_start[[length(sgRNA_f_start)+1]] <- n+5
-      sgRNA_f_end[[length(sgRNA_f_end)+1]] <- n+27
+      sgRNA_f_start[[length(sgRNA_f_start)+1]] <- x+4
+      sgRNA_f_end[[length(sgRNA_f_end)+1]] <- x+26
     }
-    n <- n+1
   }
   ## Same as above but with the reverse sequence
-  n <- 0
-  for (x in 0:num_char_in_seq){
-    poss_sgRNA <- substr(rev_seq, 1+n, 30+n)
+  for (x in 1:num_char_in_seq){
+    poss_sgRNA <- substr(rev_seq, x, 29+x)
     if (str_detect(poss_sgRNA, PAM) == TRUE){
       sgRNA_list_r[[length(sgRNA_list_r)+1]] <- poss_sgRNA
-      sgRNA_r_start[[length(sgRNA_r_start)+1]] <- nchar(rev_seq)-n+5
-      sgRNA_r_end[[length(sgRNA_r_end)+1]] <- nchar(rev_seq)-n+27
+      sgRNA_r_start[[length(sgRNA_r_start)+1]] <- nchar(rev_seq)-x+4
+      sgRNA_r_end[[length(sgRNA_r_end)+1]] <- nchar(rev_seq)-x+26
     }
-    n <- n+1
   }
   ## Removes any sgRNA that contain degerate bases
   sgRNA_list_f <- sgRNA_list_f[grepl("[UWSMKRYBDHVNZ]", sgRNA_list_f) == FALSE]
@@ -88,7 +85,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
     sgRNA_seq <- sapply(sgRNA_list, breakseq)
     ## Creates a list with only the PAM sequences
     breakPAM <- function(seqlist){
-      str_sub(seqlist, 25, 27)
+      str_sub(seqlist, 25, (24+nchar(setPAM)))
     }
     sgRNA_PAM <- sapply(sgRNA_list, breakPAM)
     ## Makes a list of all of the sgRNA sequences with their PAM
@@ -103,8 +100,8 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
       ((str_count(seqlist, "G") + str_count(seqlist, "C")) / 20)
     }
     GCinstance <- sapply(sgRNA_seq, FindGC)
-    ## Creates a list that determines if the GC percentage
-    ## is within the user-defined (WIP) threshold
+    ## Creates a list that determines the GC percentage
+    ## Consider whether to keep this
     EvalGC <- function(GC){
       isTRUE(30<=GC&GC<= 70)
     }
@@ -243,7 +240,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
       off_offseq <- c()
       off_chr <- c()
       off_mismatch <- c()
-      ## Creates a list of acceptable PAMs
+      ## Creates a list of acceptable "NGG" PAMs
       PAM_test_list <- c("GG", "AG", "CG", "GA", "GC", "GT", "TG")
       rev_PAM_test_list <- c("CC", "CT", "CG", "TC", "GC", "AC", "CA")
       for (seqname in seqnames) {
