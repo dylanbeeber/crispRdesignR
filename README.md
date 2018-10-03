@@ -28,13 +28,15 @@ All of the required files must present in the working directory, this includes D
 
 ##### sgRNA Design
 
-All data is generated with a single function: `sgRNA_design(userseq, genomename, gtfname, calloffs = TRUE, annotateoffs = TRUE)`
+All data is generated with a single function: `sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE)`
 
 `userseq`: The target sequence to generate sgRNA guides for. Can either be a character sequence containing DNA bases or the name of a fasta/text file in the working directory.
 
 `genomename`: The name of a geneome (in BSgenome format) to check for off-targets in. These genomes can be downloaded through BSgenome or compiled by the user.
 
 `gtfname`: The name of a genome annotation file (.gtf) in the working directory to check off-target sequences against.
+
+`userPAM`: An optional argument used to set a custom PAM for the sgRNA. If not set, the function will default to the "NGG" PAM. Warning: Doench efficieny scores are only accurate for the "NGG" PAM.
 
 `calloffs`: If TRUE, the function will search for off-targets in the genome chosen specified by the genomename argument. If FALSE, off-target calling will be skipped.
 
