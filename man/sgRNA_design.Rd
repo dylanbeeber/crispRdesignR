@@ -6,17 +6,19 @@
 sgRNA_design returns information to design sgRNA sequences based on a given target sequence, a genome to annotate off-target information, and a genome annoation file (.gtf), to annotate the off-target findings.
 }
 \usage{
-sgRNA_design(userseq, genomename, gtfname, calloffs = TRUE, annotateoffs = TRUE)
+sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{usersequence}{
     The target sequence to generate sgRNA guides for. Can either be a character sequence containing DNA bases or the name of a fasta file in the working directory.
-}
+  }
   \item{genomename}{
     The name of a geneome (from the BSgenome package) to check off-targets for.
   }
   \item{gtfname}{The name of a genome annotation file (.gtf) in the working directory to check off-target sequences against.
+  }
+  \item{userPAM}{An optional argument used to set a custom PAM for the sgRNA. If not set, the function will default to the "NGG" PAM. Warning: Doench efficieny scores are only accurate for the "NGG" PAM.
   }
   \item{calloffs}{If TRUE, the function will search for off-targets in the genome chosen specified by the genomename argument. If FALSE, off-target calling will be skipped.
   }
