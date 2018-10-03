@@ -46,6 +46,9 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
   ## only 20 nucleotides long, nucleotides surrounding the sgRNA
   ## are used for study-based scoring
   setPAM <- userPAM
+  if (setPAM != "NGG") {
+    print("Warning: Doench efficiency scores are only accurate for NGG PAMs")
+  }
   usesetPAM <- str_replace_all(setPAM, "N", ".")
   lengthpostPAM <- (6 - nchar(usesetPAM))
   PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
@@ -104,23 +107,12 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       ((str_count(seqlist, "G") + str_count(seqlist, "C")) / 20)
     }
     GCinstance <- sapply(sgRNA_seq, FindGC)
-    ## Creates a list that determines the GC percentage
-    ## Consider whether to keep this
-    EvalGC <- function(GC){
-      isTRUE(30<=GC&GC<= 70)
-    }
-    GClist <- sapply(GCinstance, EvalGC)
     ## Find homopolmers
     Findhomopolymer <- function(seqlist){
       str_detect(seqlist, "TTTT|AAAA|GGGG|CCCC")
     }
     Homopolymerdetect <- sapply(sgRNA_seq, Findhomopolymer)
     Homopolymerdetect
-    ## Find TTTT homopolymers
-    FindTTTThomopolymer <- function(seqlist){
-      str_detect(seqlist, "TTTT")
-    }
-    TTTTHomopolymerdetect <- sapply(sgRNA_seq, FindTTTThomopolymer)
     ## Detect Self complementarity
     self_comp_list <- c()
     ## Region of sgRNA backbone that is vulnerable to forming hairpins
@@ -210,9 +202,9 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       mm3_list <- rep("NA", each = length(sgRNA_list))
       mm4_list <- rep("NA", each = length(sgRNA_list))
       ## Creates data table with all available sgRNA data
-      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, TTTTHomopolymerdetect, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
       ## Set the names of each column
-      colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "TTTT Homopolymer", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+      colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
       sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Doench Score`),]
       ## Creates an empty data table for off-target annotation
       all_offtarget_info <- data.frame("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA")
@@ -410,9 +402,9 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       ## Decides whether to annotate off_targets
       if (((sum(mm0_list) + sum(mm1_list) + sum(mm2_list) + sum(mm3_list)) == 0) || (annotateoffs == FALSE)) {
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, TTTTHomopolymerdetect, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
         ## Set the names of each column
-        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "TTTT Homopolymer", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Doench Score`),]
         sgRNA_data
       } else {
@@ -466,9 +458,9 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
         all_offtarget_info <- data.frame(off_sgRNAseq, off_chr, off_start, off_end, off_mismatch, off_direction, CFD_Scores, off_offseq, more_off_info$geneidlist, more_off_info$genenamelist, more_off_info$sequencetypelist, more_off_info$exonnumberlist)
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, TTTTHomopolymerdetect, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
         ## Set the names of each column
-        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "TTTT Homopolymer", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Doench Score`),]
         data_list <- c("sgRNA_data" = sgRNA_data, "all_offtarget_info" = all_offtarget_info)
         data_list
