@@ -42,9 +42,10 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
   ## only 20 nucleotides long, nucleotides surrounding the sgRNA
   ## are used for study-based scoring
   setPAM <- "NGG"
-  usesetPAM <- str_replace(setPAM, "N", ".")
+  usesetPAM <- str_replace_all(setPAM, "N", ".")
   lengthpostPAM <- (6 - nchar(usesetPAM))
   PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
+  print(PAM)
   ## Searches all 23 nt streches in the sequence for
   ## possible matches to the PAM, then puts entire 30 nt
   ## matches into a list (including the PAM)
@@ -223,7 +224,6 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
         DNAString(seqlist)
       }
       Biostrings_sgRNA <- lapply(sgRNA_with_PAM, multiple_DNAString)
-      Off_targ_Bio_sgRNA <- Biostrings_sgRNA
       ## Define genome
       usegenome <- genomename
       seqnames <- seqnames(usegenome)
@@ -255,14 +255,14 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
         revchrmm2_list <- c()
         revchrmm3_list <- c()
         revchrmm4_list <- c()
-        for (pattern in Off_targ_Bio_sgRNA) {
-          usepattern <- replaceLetterAt(pattern, 21, "N")
+        for (pattern in Biostrings_sgRNA) {
+          usepattern <- DNAString(paste(substr(as.character(pattern), 1, 20), setPAM, sep ="", collapse =""))
           subject <- usegenome[[seqname]]
           ## Searches for off-targets in the forward strand
           off_info <- matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = FALSE)
-          off_info_position <- c()
           ## Excludes off-targets that contain invalid "NGG" PAMs
           if (setPAM == "NGG") {
+            off_info_position <- c()
             if (length(off_info) > 0) {
               for (f in 1:length(off_info)) {
                 if (substr(as.character(off_info[[f]]), 22, 23) %in% PAM_test_list) {
@@ -270,15 +270,15 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
                 }
               }
             }
+            off_info <- off_info[off_info_position]
           }
-          off_info <- off_info[off_info_position]
           mis_info <- mismatch(usepattern, off_info, fixed = FALSE)
           ## Searches for off-targets in the reverse strand
           rev_pattern <- reverseComplement(usepattern)
           rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = FALSE)
-          rev_off_info_position <- c()
           ## Excludes off-targets that contain invalid "NGG" PAMs
           if (setPAM == "NGG") {
+            rev_off_info_position <- c()
             if (length(rev_off_info) > 0) {
               for (f in 1:length(rev_off_info)) {
                 if (substr(as.character(rev_off_info[[f]]), 1, 2) %in% rev_PAM_test_list) {
@@ -286,8 +286,8 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
                 }
               }
             }
+            rev_off_info <- rev_off_info[rev_off_info_position]
           }
-          rev_off_info <- rev_off_info[rev_off_info_position]
           rev_mis_info <- mismatch(rev_pattern, rev_off_info, fixed = FALSE)
           if (length(off_info) > 0) {
             for (f in 1:length(off_info)) {
