@@ -1,7 +1,10 @@
 ## This function needs a genome (from BSgenome to check for off-targets in and
 ## a gtf file to annotate the offtargets)
 
-sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotateoffs = TRUE){
+sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE){
+  if (missing(userPAM)) {
+    userPAM <- "NGG"
+  }
   ## Detects whether the user input is a .fasta or .txt file
   if (isTRUE(str_detect(userseq, ".fasta")) || (isTRUE(str_detect(userseq, ".txt")))) {
     ## Attempts to import as a .fasta file
@@ -18,6 +21,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
     sequence <- str_replace_all(sequence, fixed(" "), "")
     Biostrings_sequence <- DNAString(sequence)
   }
+  print("Searching sequence for possible target sites")
   ## Creates a character string that contains the
   ## complementary sequence (Both in the reverse
   ## direction and with substituted nucleotides)
@@ -41,11 +45,10 @@ sgRNA_design <- function(userseq, genomename, gtfname, calloffs = TRUE, annotate
   ## will describe as a possible sgRNA. Even though most sgRNA is
   ## only 20 nucleotides long, nucleotides surrounding the sgRNA
   ## are used for study-based scoring
-  setPAM <- "NGG"
+  setPAM <- userPAM
   usesetPAM <- str_replace_all(setPAM, "N", ".")
   lengthpostPAM <- (6 - nchar(usesetPAM))
   PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
-  print(PAM)
   ## Searches all 23 nt streches in the sequence for
   ## possible matches to the PAM, then puts entire 30 nt
   ## matches into a list (including the PAM)
