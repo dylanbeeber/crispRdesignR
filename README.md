@@ -56,8 +56,10 @@ The additional off-target data can be retrieved with `getofftargetdata(x)`
 
 ###### Example:
 `alldata <- sgRNA_design("GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz")`
+
 `sgRNAdata <- getsgRNAdata(alldata)`
+
 `offtargetdata <- getofftargetdata(alldata)`
 
 ###### Example:
-`exampledata <- sgRNA_design("DAK1.fasta", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz", calloffs = TRUE, annotateoffs = FALSE)`
+`exampledata <- sgRNA_design("DAK1.fasta", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz", "NAG", calloffs = TRUE, annotateoffs = FALSE)`
