@@ -143,7 +143,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       self_comp_list[[length(self_comp_list)+1]] <- sum(individ_comp_list)
     } ## Self comp checking ends here
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
-    Rule_Set_2_Model <- readRDS("Rule_Set_2_Model.rds")
+    data("Rule_Set_2_Model")
     Efficiency_Score <- predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
     if (calloffs == FALSE) {
       mm0_list <- rep("NA", each = length(sgRNA_list))
