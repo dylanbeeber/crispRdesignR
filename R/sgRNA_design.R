@@ -1,7 +1,7 @@
 ## This function needs a genome (from BSgenome to check for off-targets in and
 ## a gtf file to annotate the offtargets)
 
-sgRNA_design_Doench2014 <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE){
+sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE){
   if (missing(userPAM)) {
     userPAM <- "NGG"
   }
@@ -142,59 +142,9 @@ sgRNA_design_Doench2014 <- function(userseq, genomename, gtfname, userPAM, callo
       }
       self_comp_list[[length(self_comp_list)+1]] <- sum(individ_comp_list)
     } ## Self comp checking ends here
-    ## Assign a study-based efficiency score
-    ## Following two lines retrieve the penalty constants (one for single nucleotides, the other for paired nucleotides)
-    Doench_model_weights_singleonly <- read.csv("Doench_Model_Weights_Singleonly.csv", header = FALSE)
-    Doench_model_weights_doubleonly <- read.csv("Doench_Model_Weights_Doubleonly.csv", header = FALSE)
-    ## Creates an empty list for Doench study-based scores to go into
-    Doench_Score <- c()
-    ## "g" allows this script to go through the sgRNA_list, one by one
-    g <- 0
-    for (h in 1:length(sgRNA_list)){
-      ## Splits the sgRNA into individual nucleotides
-      split_sgRNA <- str_split(sgRNA_list[1+g], "", simplify = TRUE)
-      ## Creates the sgRNA_model_weight list and adds the intercept to it
-      sgRNA_model_weights <- c(0.597636154)
-      ## Finds the model weights for each individual nucleotide in the sgRNA and adds them to sgRNA_model_weights
-      n <- 0
-      for (t in 1:39){
-        if ((split_sgRNA[,Doench_model_weights_singleonly[1+n, 2]] == Doench_model_weights_singleonly[1+n, 1]) == TRUE){
-          sgRNA_model_weights[[length(sgRNA_model_weights)+1]] <- Doench_model_weights_singleonly[1+n, 3]
-        }
-        n <- n+1
-      }
-      ## Splits the sgRNA into pieces two nucleotides long
-      ## Serves the same purpose as: "split_sgRNA <- str_split(sgRNA_list[1+g], "", simplify = TRUE)"
-      double <- ".."
-      split_double_sgRNA <- c()
-      n <- 0
-      for (xp in 1:29){
-        double_sgRNA <- substr(sgRNA_list[1+g], 1+n, 2+n)
-        split_double_sgRNA[[length(split_double_sgRNA)+1]] <- double_sgRNA
-        n <- n+1
-      }
-      ## Finds the model weights for each double nucleotide in the sgRNA and adds them to sgRNA_model_weights
-      n <- 0
-      for (t in 1:31){
-        if ((split_double_sgRNA[Doench_model_weights_doubleonly[1+n, 2]] == Doench_model_weights_doubleonly[1+n, 1]) == TRUE){
-          sgRNA_model_weights[[length(sgRNA_model_weights)+1]] <- Doench_model_weights_doubleonly[1+n, 3]
-        }
-        n <- n+1
-      }
-      GC <- (((str_count(sgRNA_seq[1+g], "G") + str_count(sgRNA_seq[1+g], "C")) / 20) * 100)
-      if (isTRUE(GC>70 & 80>=GC) == TRUE) {
-        sgRNA_model_weights[[length(sgRNA_model_weights)+1]] <- -0.202625894258
-      }
-      if (isTRUE(GC<30 & GC>=20) == TRUE) {
-        sgRNA_model_weights[[length(sgRNA_model_weights)+1]] <- -0.202625894258
-      }
-      if (isTRUE(GC<20 | GC>80) == TRUE) {
-        sgRNA_model_weights[[length(sgRNA_model_weights)+1]] <- -0.166587751983
-      }
-      ## Completes the calculation described in Doench et al. (2014) and adds it to the Doench Score list
-      Doench_Score[[length(Doench_Score)+1]] <- round(1/(1+exp(-(sum(sgRNA_model_weights)))), digits = 3)
-      g <- g+1
-    }
+    processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
+    Rule_Set_2_Model <- readRDS("Rule_Set_2_Model.rds")
+    Efficiency_Score <- predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
     if (calloffs == FALSE) {
       mm0_list <- rep("NA", each = length(sgRNA_list))
       mm1_list <- rep("NA", each = length(sgRNA_list))
@@ -202,10 +152,10 @@ sgRNA_design_Doench2014 <- function(userseq, genomename, gtfname, userPAM, callo
       mm3_list <- rep("NA", each = length(sgRNA_list))
       mm4_list <- rep("NA", each = length(sgRNA_list))
       ## Creates data table with all available sgRNA data
-      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
       ## Set the names of each column
-      colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
-      sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Doench Score`),]
+      colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+      sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
       ## Creates an empty data table for off-target annotation
       all_offtarget_info <- data.frame("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA")
       colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Score", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
@@ -402,10 +352,10 @@ sgRNA_design_Doench2014 <- function(userseq, genomename, gtfname, userPAM, callo
       ## Decides whether to annotate off_targets
       if (((sum(mm0_list) + sum(mm1_list) + sum(mm2_list) + sum(mm3_list)) == 0) || (annotateoffs == FALSE)) {
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
         ## Set the names of each column
-        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
-        sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Doench Score`),]
+        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+        sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
         sgRNA_data
       } else {
         ## Creates a function that annotates the off-targets called above
@@ -458,10 +408,10 @@ sgRNA_design_Doench2014 <- function(userseq, genomename, gtfname, userPAM, callo
         all_offtarget_info <- data.frame(off_sgRNAseq, off_chr, off_start, off_end, off_mismatch, off_direction, CFD_Scores, off_offseq, more_off_info$geneidlist, more_off_info$genenamelist, more_off_info$sequencetypelist, more_off_info$exonnumberlist)
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Doench_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
         ## Set the names of each column
-        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Doench Score", "MM0", "MM1", "MM2", "MM3", "MM4")
-        sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Doench Score`),]
+        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+        sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
         data_list <- c("sgRNA_data" = sgRNA_data, "all_offtarget_info" = all_offtarget_info)
         data_list
       }
