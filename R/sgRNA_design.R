@@ -143,7 +143,6 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       self_comp_list[[length(self_comp_list)+1]] <- sum(individ_comp_list)
     } ## Self comp checking ends here
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
-    data("Rule_Set_2_Model")
     Efficiency_Score <- predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
     if (calloffs == FALSE) {
       mm0_list <- rep("NA", each = length(sgRNA_list))
@@ -307,7 +306,6 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       }
       ## Calculates off-target scores for each off target sequence
       print("annotating off-targets")
-      CFD_Model_Scores <- read.csv("CFD_Scoring.csv")
       off_model_PAMs <- c("AG", "CG", "GA", "GC", "GT", "TG")
       CFD_PAM_Scores <- data.frame(off_model_PAMs, c(0.259259, 0.107142, 0.069444, 0.022222, 0.016129, 0.038961))
       CFD_Scores <- c()
