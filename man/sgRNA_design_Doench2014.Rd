@@ -3,7 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{sgRNA Target Design}
 \description{
-sgRNA_design returns information to design sgRNA sequences based on a given target sequence, a genome to annotate off-target information, and a genome annoation file (.gtf), to annotate the off-target findings.
+(Outdated) sgRNA_design returns information to design sgRNA sequences based on a given target sequence, a genome to annotate off-target information, and a genome annoation file (.gtf), to annotate the off-target findings. Uses the Doench 2014 method of sgRNA Efficiency Scoring.
 }
 \usage{
 sgRNA_design(userseq, genomename, gtfname, calloffs = TRUE, annotateoffs = TRUE)
