@@ -15,7 +15,7 @@ CFD_Scoring.csv - A data table that contains the information used to calculate t
 ## Dependencies
 gbm: `install.packages("gbm")`
 
-vtreat: `install.packages("vtreat", repos='http://cran.us.r-project.org')`
+vtreat: `install.packages("vtreat")`
 
 stringr: `install.packages("stringr", repos='http://cran.us.r-project.org')`
 
