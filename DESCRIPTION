@@ -25,6 +25,7 @@ Imports:
   stringr,
   vtreat
 Suggests: 
+  Shiny,
   BSgenome.Hsapiens.UCSC.hg19,
   BSgenome.Scerevisiae.UCSC.sacCer2
 LazyData: true
