@@ -7,7 +7,7 @@
 ##
 ## if stringr needs to be installed:
 ## install.packages("stringr", repos='http://cran.us.r-project.org')
-sgRNA_design <- function(usersequence, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
+sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
   designprogress$inc(1/10, message = "Finding sgRNA")
   ## Detects whether the user input is a .fasta
   if (isTRUE(str_detect(usersequence, ".fasta"))){
