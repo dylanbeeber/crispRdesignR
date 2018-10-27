@@ -306,7 +306,6 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
         }
       } ## Off Target search done
       ## Calculates off-target scores for each off target sequence
-      CFD_Model_Scores <- read.csv("CFD_Scoring.csv")
       off_model_PAMs <- c("AG", "CG", "GA", "GC", "GT", "TG")
       CFD_PAM_Scores <- data.frame(off_model_PAMs, c(0.259259, 0.107142, 0.069444, 0.022222, 0.016129, 0.038961))
       CFD_Scores <- c()
