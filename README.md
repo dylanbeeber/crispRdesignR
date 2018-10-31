@@ -41,15 +41,17 @@ Steps to install crispRdesignR (tested in R version 3.4.4):
 
 If installing the package through devtools, activate crispRdesignR with `library(crispRdesignR)`. Be sure to also use BSgenome to install and activate a genome to search for off-targets in (ex. `library("BSgenome.Scerevisiae.UCSC.sacCer2")`). Then place the genome annotation file (.gtf) and any .FASTA files that you may wish to use in your working directory.
 
+To use the graphic interface, the shiny package must be installed with `install.packages("shiny")`, and loaded with `library(shiny)`.
+
 Genome annotation files can be found here: https://useast.ensembl.org/info/data/ftp/index.html
 
 ##### crispRdesignRUI
 
-The UI can be activated by entering `crispRdesignRUI()` into the console. Be sure that the shiny package is installed and activated.
+The graphic interface can be activated by entering `crispRdesignRUI()` into the console. Be sure that the shiny package is installed and activated.
 
 ##### sgRNA Design
 
-All data can be generated without the UI by using a single function: `sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE)`
+All data can be generated without the graphic interface by using a single function: `sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE)`
 
 `userseq`: The target sequence to generate sgRNA guides for. Can either be a character sequence containing DNA bases or the name of a fasta/text file in the working directory.
 
