@@ -31,15 +31,13 @@ Steps to install crispRdesignR (tested in R version 3.4.4):
 
 `library("BSgenome.Scerevisiae.UCSC.sacCer2")`
 
-##### Install crispRdesignR through devtools
+#Install crispRdesignR, where "path_to_directory" is the path of the decompressed crispRdesignR-master folder
 
-`install_github("dylanbeeber/crispRdesignR")`
+`install.packages(path_to_directory, repos = NULL, type="source")`
 
 ## Usage
 
-If installing the package through devtools, activate crispRdesignR with `library(crispRdesignR)`. Be sure to also use BSgenome to install and activate a genome to search for off-targets in (ex. `library("BSgenome.Scerevisiae.UCSC.sacCer2")`). Then place the genome annotation file (.gtf) and any .fasta files that you may wish to use in your working directory. To use the graphic interface, the shiny package must be installed with `install.packages("shiny")`, and loaded with `library(shiny)`.
-
-If cloning the repository and installing from source, be sure to load the sysdata.rda into R with `load(sysdata.rda)` in addition to installing and activating a genome of choice (ex. `library("BSgenome.Scerevisiae.UCSC.sacCer2")`). All functions provided in the the /R/ folder must be placed in the working directory and loaded like `source("sgRNA_design.R)`. Then place the genome annotation file (.gtf) and any .fasta files that you may wish to use in your working directory.
+Activate crispRdesignR with `library(crispRdesignR)`. Be sure to also use BSgenome to install and activate a genome to search for off-targets in (ex. `library("BSgenome.Scerevisiae.UCSC.sacCer2")`). Then place the genome annotation file (.gtf) and any .fasta files that you may wish to use in your working directory. To use the graphic interface, the shiny package must be installed with `install.packages("shiny")`, and loaded with `library(shiny)`.
 
 To use the graphic interface, the shiny package must be installed with `install.packages("shiny")`, and loaded with `library(shiny)`.
 
@@ -48,8 +46,6 @@ Genome annotation files can be found here: https://useast.ensembl.org/info/data/
 ##### crispRdesignRUI
 
 The graphic interface can be activated by entering `crispRdesignRUI()` into the console. Be sure that the shiny package is installed and activated.
-
-Note: The `crispRdesignRUI()` function is only intended to be used when the package has been installed through devtools. The UI can also be activated by placing the RunShiny.R script in the working directory and using the command `runApp(RunShiny.R)`
 
 ##### sgRNA Design
 
