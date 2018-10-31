@@ -5,19 +5,35 @@ This software aims to provide all scientifically pertinent information when desi
 
 crispRdesignR is tested in R 3.4.4.
 
-## Dependencies
-gbm: `install.packages("gbm")`
+## Installation and dependencies
 
-vtreat: `install.packages("vtreat")`
+Steps to install crispRdesignR (tested in R version x...):
 
-stringr: `install.packages("stringr", repos='http://cran.us.r-project.org')`
+##### dependencies gbm, vtreat and stringr:
 
-BioStrings and BSgenome packages through Bioconductor: `source("https://bioconductor.org/biocLite.R")`
-Then: `biocLite("Biostrings", "BSgenome", "BSgenome.Hsapiens.UCSC.hg19", "AnnotationHub")` The user may choose to download other genomes and use them with the crispRdesignR package.
+`install.packages("gbm")`
 
-Devtools (to install this package directly from github): `install.packages("devtools")`
-Then ensure you have a working development environment: https://www.r-project.org/nosvn/pandoc/devtools.html
-To install crispRdesignR: `install_github(dylanbeeber/crispRdesignR)`
+`install.packages("vtreat")`
+
+`install.packages("stringr", repos='http://cran.us.r-project.org')`
+
+##### dependencies BioStrings and BSgenome packages through Bioconductor:
+
+`source("https://bioconductor.org/biocLite.R")`
+
+`biocLite("Biostrings")`
+
+`biocLite("BSgenome")`
+
+`biocLite("AnnotationHub")`
+
+##### Your genome(s) of interest from BSgenome. The example dataset uses the yeast genome
+
+`biocLite("BSgenome.Scerevisiae.UCSC.sacCer2")`
+
+##### Install crispRdesignR, where "path_to_directory" is the path of the decompressed crispRdesignR-master folder
+
+`install.packages(path_to_directory, repos = NULL, type="source")`
 
 ## Usage
 
