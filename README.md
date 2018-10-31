@@ -3,8 +3,6 @@ Software used to design guide RNA sequences for CRISPR/Cas9 genome editing
 
 This software aims to provide all scientifically pertinent information when designing guide RNA sequences for Cas9 genome editing. When provided a target DNA sequence for editing, a genome to check for off-targets in, and a genome annotation file (.gtf) to provide addition information about off-target matches it will out put information for two separate data tables. The first table contains all information on the generated sgRNA themselves (sgRNA sequence, PAM, Direction, Start, End, GC content, Presence of Homopolymers, Self Complementarity, Effciency Score (Doench 2016), and Genomic Matches). The second table contains all information on the found off-target sequences (Original sgRNA Sequence, Chromosome, Start, End, Number of Mismatches, Direction, CFD Scores, Matched Sequence, Gene ID, Gene Name, Sequence Type, and Exon Number). Additionally, a user may provide their own DNA libraries to search for off targets in and use a genome annotation file of their preference.
 
-Sample data for use with crispRdesignR can be found at: https://github.com/dylanbeeber/crispRdesignRsampledata
-
 ## Installation and dependencies
 
 Steps to install crispRdesignR (tested in R version 3.4.4):
@@ -92,3 +90,7 @@ Uses same arguments as `sgRNA_design`
 
 ###### Example:
 `exampledata <- sgRNA_design("DAK1.fasta", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz", "NAG", calloffs = TRUE, annotateoffs = FALSE)`
+
+## Example Data
+
+Example Data is located in /inst/ folder. To use the DAK1.fasta file, place it in the working directory and refer to it in crispRdesignR. The DAK1_short.txt file contains a short DNA sequence that can be copied and pasted into crispRdesignR. Both sequences are native to the DAK1 gene in Saccharomyces cerevisiae. The "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz" file is a genome annotation file for Saccharomyces cerevisiae and must also be placed in the working directory.
