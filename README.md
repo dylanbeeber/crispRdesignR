@@ -31,7 +31,7 @@ Steps to install crispRdesignR (tested in R version 3.4.4):
 
 `library("BSgenome.Scerevisiae.UCSC.sacCer2")`
 
-#Install crispRdesignR, where "path_to_directory" is the path of the decompressed crispRdesignR-master folder
+##### Install crispRdesignR, where "path_to_directory" is the path of the decompressed crispRdesignR-master folder
 
 `install.packages(path_to_directory, repos = NULL, type="source")`
 
