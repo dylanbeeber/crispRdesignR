@@ -30,6 +30,7 @@ Steps to install crispRdesignR (tested in R version 3.4.4):
 ##### Your genome(s) of interest from BSgenome. The example dataset uses the yeast genome
 
 `biocLite("BSgenome.Scerevisiae.UCSC.sacCer2")`
+
 `library("BSgenome.Scerevisiae.UCSC.sacCer2")`
 
 ##### Install crispRdesignR, where "path_to_directory" is the path of the decompressed crispRdesignR-master folder
