@@ -1,12 +1,4 @@
 ## For this script to work properly, this script must be run from Shiny
-## The working directory must be set to a folder that contains this
-## script, the shiny script, and the files:
-## "Doench_Model_Weights_Singleonly.csv" and "Doench_Model_Weights_Doubleonly.csv"
-##
-## example: setwd("C://Users//Dylan//Desktop//SP")
-##
-## if stringr needs to be installed:
-## install.packages("stringr", repos='http://cran.us.r-project.org')
 sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
   designprogress$inc(1/10, message = "Finding sgRNA")
   ## Detects whether the user input is a .fasta
