@@ -30,6 +30,7 @@ Steps to install crispRdesignR (tested in R version 3.4.4):
 ##### Your genome(s) of interest from BSgenome. The example dataset uses the yeast genome
 
 `biocLite("BSgenome.Scerevisiae.UCSC.sacCer2")`
+`library("BSgenome.Scerevisiae.UCSC.sacCer2")`
 
 ##### Install crispRdesignR, where "path_to_directory" is the path of the decompressed crispRdesignR-master folder
 
@@ -37,7 +38,11 @@ Steps to install crispRdesignR (tested in R version 3.4.4):
 
 ## Usage
 
-All of the required files must present in the working directory, this includes Rule_Set_2_Model.rds, CFD_Scoring.csv, and a user supplied genome annotation file (.gtf). Genome annotation files can be found here: https://useast.ensembl.org/info/data/ftp/index.html
+If installing the package through devtools, activate crispRdesignR with `library(crispRdesignR)`. Be sure to also use BSgenome to install and activate a genome to choice to search for off-targets in (ex. `library("BSgenome.Scerevisiae.UCSC.sacCer2")`). Finally, place the genome annotation file (.gtf) that you wish to use in your working directory.
+
+If cloning the repository, source the necesary files 
+
+Genome annotation files can be found here: https://useast.ensembl.org/info/data/ftp/index.html
 
 ##### sgRNA Design
 
