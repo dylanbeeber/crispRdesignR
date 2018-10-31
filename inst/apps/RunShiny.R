@@ -1,26 +1,23 @@
-## This script is designed to be used with "FindsgRNAfunction_Doench2014.R"
-## "Doench_Model_Weights_Singleonly.csv", "Doench_Model_Weights_Doubleonly.csv",
-## and "CFD_Scoring.csv"
-## The above files must be in the working directory
-##
-## example: setwd("C://Users//Dylan//Desktop//SP")
-##
-##
+#### Note: Genomes must be installed and activated (ex. library("BSgenome.Hsapiens.UCSC.hg19")) before they can be used.
+
 ## if packages need to be installed
 ## install.packages("shiny")
 ## install.packages("stringr", repos='http://cran.us.r-project.org')
 ## install.packages("stringi")
 ## source("https://bioconductor.org/biocLite.R")
-## biocLite("Biostrings", "BSgenome", "BSgenome.Hsapiens.UCSC.hg19", "AnnotationHub")
+## biocLite("Biostrings")
+## biocLite("BSgenome")
+## biocLite("AnnotationHub")
+## biocLite("BSgenome.Hsapiens.UCSC.hg19")
+## biocLite("BSgenome.Hsapiens.UCSC.hg38")
 ## biocLite("BSgenome.Scerevisiae.UCSC.sacCer2")
-##
-## In order to access shinyapps server
-## install.packages('rsconnect')
-## Additionally, to access the shinyapps server your desktop must
-## be authorized
-##
-## Activate packages
-##library(rsconnect)
+## biocLite("BSgenome.Mmusculus.UCSC.mm10")
+## biocLite("BSgenome.Dmelanogaster.UCSC.dm6")
+## biocLite("BSgenome.Ptroglodytes.UCSC.panTro5")
+## biocLite("BSgenome.Ecoli.NCBI.20080805")
+## biocLite("BSgenome.Celegans.UCSC.ce11")
+## biocLite("BSgenome.Rnorvegicus.UCSC.rn6")
+## biocLite("BSgenome.Athaliana.TAIR.04232008")
 library(shiny)
 library(stringr)
 library(vtreat)
@@ -29,9 +26,9 @@ library(IRanges)
 library(GenomicRanges)
 library(rtracklayer)
 library(Biostrings)
-library(BSgenome.Hsapiens.UCSC.hg19)
+#library(BSgenome.Hsapiens.UCSC.hg19)
 #library(BSgenome.Hsapiens.UCSC.hg38)
-library(BSgenome.Scerevisiae.UCSC.sacCer2)
+#library(BSgenome.Scerevisiae.UCSC.sacCer2)
 ##library(BSgenome.Mmusculus.UCSC.mm10)
 ##library(BSgenome.Dmelanogaster.UCSC.dm6)
 ##library(BSgenome.Ptroglodytes.UCSC.panTro5)
