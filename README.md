@@ -15,6 +15,10 @@ Steps to install crispRdesignR (tested in R version 3.4.4):
 
 `install.packages("stringr", repos='http://cran.us.r-project.org')`
 
+##### dependencies shiny, for the user interface
+
+`install.packages("shiny")`
+
 ##### dependencies BioStrings and BSgenome packages through Bioconductor:
 
 `source("https://bioconductor.org/biocLite.R")`
@@ -46,6 +50,8 @@ Genome annotation files can be found here: https://useast.ensembl.org/info/data/
 ##### crispRdesignRUI
 
 The graphic interface can be activated by entering `crispRdesignRUI()` into the console. Be sure that the shiny package is installed and activated.
+
+Note: Genomes must be installed and activated before they can be used in the shiny app.
 
 ##### sgRNA Design
 
