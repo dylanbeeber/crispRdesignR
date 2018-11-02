@@ -41,19 +41,35 @@ Steps to install crispRdesignR (tested in R version 3.4.4):
 
 `install.packages(path_to_directory, repos = NULL, type="source")`
 
-## Usage
+## Quick start with the GUI
 
-Activate crispRdesignR with `library(crispRdesignR)`. Be sure to also use BSgenome to install and activate a genome to search for off-targets in (ex. `library("BSgenome.Scerevisiae.UCSC.sacCer2")`). Then place the genome annotation file (.gtf) and any .fasta files that you may wish to use in your working directory. To use the graphic interface, the shiny package must be installed with `install.packages("shiny")`, and loaded with `library(shiny)`.
+Example Data is located in /inst/ folder.
 
-To use the graphic interface, the shiny package must be installed with `install.packages("shiny")`, and loaded with `library(shiny)`.
+The DAK1.fasta and DAK1_short.txt file contains a DNA sequence native to the DAK1 gene that can be copied and pasted into crispRdesignR or uploaded as a file (in the GUI version).
+
+The "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz" file is the compressed genome annotation file for Saccharomyces cerevisiae.
+
+Using the GUI version:
+
+`library(gbm,vtreat,shiny,cripsRdesignR ….)
+
+`crispRdesignRUI()`
+
+click on the “UseFASTA or txt file as target sequence” button and choose the DAK1.fasta or DAK1_short.txt file, or copy and paste the sequence in the box
+
+select the Saccharomyces cerevisiae genome
+
+browse to choose the .gtf file Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz
+
+click on the Find sgRNA button
+
+![crisprdesignrss](https://user-images.githubusercontent.com/38253997/47938309-10169980-deba-11e8-83de-c00e4a6b72cd.PNG)
 
 Genome annotation files can be found here: https://useast.ensembl.org/info/data/ftp/index.html
 
-##### crispRdesignRUI
+Note: Genomes must be installed (with `install.packages(BSgenome.yourgenome)`) and activated (with `library(yourgenome)` before they can be used in the shiny app.
 
-The graphic interface can be activated by entering `crispRdesignRUI()` into the console. Be sure that the shiny package is installed and activated.
-
-Note: Genomes must be installed and activated before they can be used in the shiny app.
+## Command-line version
 
 ##### sgRNA Design
 
