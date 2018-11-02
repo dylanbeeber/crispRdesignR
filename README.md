@@ -65,9 +65,9 @@ click on the Find sgRNA button
 
 ![crisprdesignrss](https://user-images.githubusercontent.com/38253997/47938309-10169980-deba-11e8-83de-c00e4a6b72cd.PNG)
 
-Genome annotation files can be found here: https://useast.ensembl.org/info/data/ftp/index.html
+Additional Genome annotation files can be found here: https://useast.ensembl.org/info/data/ftp/index.html
 
-Note: Genomes must be installed (with `install.packages(BSgenome.yourgenome)`) and activated (with `library(yourgenome)` before they can be used in the shiny app.
+Note: Even though it might be possible to select them in the GUI, Genomes must be installed (with `install.packages(BSgenome.yourgenome)`) and activated (with `library(yourgenome)` before they can be used in the shiny app.
 
 ## Command-line version
 
