@@ -77,7 +77,7 @@ All data can be generated without the graphic interface by using a single functi
 
 `userseq`: The target sequence to generate sgRNA guides for. Can either be a character sequence containing DNA bases or the name of a fasta/text file in the working directory.
 
-`genomename`: The name of a geneome (in BSgenome format) to check for off-targets in. These genomes can be downloaded through BSgenome or compiled by the user.
+`genomename`: The name of a genome (in BSgenome format) to check for off-targets in. These genomes can be downloaded through BSgenome or compiled by the user.
 
 `gtfname`: The name of a genome annotation file (.gtf) in the working directory to check off-target sequences against.
 
