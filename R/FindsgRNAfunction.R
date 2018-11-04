@@ -385,11 +385,7 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
               sequencetypelist[[length(sequencetypelist)+1]] <- paste(sequencetype, collapse = ", ")
               exonnumber <- mcols(gtf)$exon_number[subjectHits(olaps[which(p == queryHits(olaps))])]
               exonnumber <- unique(exonnumber)
-              for (y in 1:length(exonnumber)) {
-                if (exonnumber[y] == "NA") {
-                  exonnumber[y] <- NULL
-                }
-              }
+              exonnumber <- exonnumber[-which(is.na(exonnumber))]
               exonnumberlist[[length(exonnumberlist)+1]] <- paste(exonnumber, collapse = ", ")
             } else {
               geneidlist[[length(geneidlist)+1]] <- "NA"

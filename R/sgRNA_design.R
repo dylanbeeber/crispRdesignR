@@ -142,8 +142,10 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       }
       self_comp_list[[length(self_comp_list)+1]] <- sum(individ_comp_list)
     } ## Self comp checking ends here
+    ## Efficiency Score
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
     Efficiency_Score <- predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
+    ## Efficiency Score
     if (calloffs == FALSE) {
       mm0_list <- rep("NA", each = length(sgRNA_list))
       mm1_list <- rep("NA", each = length(sgRNA_list))
@@ -388,6 +390,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
               sequencetypelist[[length(sequencetypelist)+1]] <- paste(sequencetype, collapse = ", ")
               exonnumber <- mcols(gtf)$exon_number[subjectHits(olaps[which(p == queryHits(olaps))])]
               exonnumber <- unique(exonnumber)
+              exonnumber <- exonnumber[-which(is.na(exonnumber))]
               exonnumberlist[[length(exonnumberlist)+1]] <- paste(exonnumber, collapse = ", ")
             } else {
               geneidlist[[length(geneidlist)+1]] <- "NA"
