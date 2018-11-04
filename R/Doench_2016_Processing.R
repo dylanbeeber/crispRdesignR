@@ -2,10 +2,16 @@
 ## Extracting info from Test Set
 ## Will output a data frame with all features listed in the study
 Doench_2016_processing <- function(seqlist) {
+  ## Adds a reference sequence to help with one hot encoding if there is only one sgRNA
   ## Get single nucleotide position features
   ## Splits each sgRNA into individual nucleotides and adds them to a data frame
   for (x in 1:length(seqlist)) {
     split_sgRNA_df <- as.data.frame(str_split(seqlist, "", simplify = TRUE))
+  }
+  nuc_list <- c("A", "C", "G", "T")
+  for (x in 1:length(nuc_list)){
+    ref_sing <- t(as.matrix((rep(nuc_list[x], 30))))
+    split_sgRNA_df <- rbind(split_sgRNA_df, ref_sing)
   }
   ## Getting list of names for split_sgRNA_df and applying it
   split_names <- c()
@@ -18,27 +24,17 @@ Doench_2016_processing <- function(seqlist) {
   split_sgRNA_tplan <- vtreat::designTreatmentsZ(split_sgRNA_df, split_names, minFraction= 0, verbose=FALSE)
   ohe_split_sgRNA_df <- vtreat::prepare(split_sgRNA_tplan, split_sgRNA_df)
   ## Getting list of names for one hot encoded columns
-  nuc_list <- c("A", "C", "G", "T")
   ohe_split_names <- c()
   for (y in 1:30) {
     for (z in 1:4) {
       ohe_split_name <- paste("snt_", y, "_lev_x_", nuc_list[z], sep = "")
       ohe_split_names[[length(ohe_split_names)+1]] <- ohe_split_name
-    }  
+    }
   }
-  ## Creating a reference data frame to prevent gaps (gap example: no guides have an "A" at position 3)
-  ohe_split_sgRNA_ref_df <- data.frame(matrix(ncol = 120, nrow = 0))
-  colnames(ohe_split_sgRNA_ref_df) <- ohe_split_names
-  ## Merge the one hot encoded data frame with the reference data frame
-  ohe_split_sgRNA_df <- merge(ohe_split_sgRNA_ref_df, ohe_split_sgRNA_df, all = TRUE, sort = FALSE)
-  ## Replaces NA with 0's
-  ohe_split_sgRNA_df <- as.matrix(ohe_split_sgRNA_df)
-  ohe_split_sgRNA_df[is.na(ohe_split_sgRNA_df)] <- 0
-  ohe_split_sgRNA_df <- as.data.frame(ohe_split_sgRNA_df)
-  ## Reorders columns based on the list of names
-  ohe_split_sgRNA_df <- ohe_split_sgRNA_df[,ohe_split_names]
+  ohe_split_sgRNA_df <- ohe_split_sgRNA_df[ohe_split_names]
+  ohe_split_sgRNA_df <- ohe_split_sgRNA_df[-c((nrow(ohe_split_sgRNA_df)-3):nrow(ohe_split_sgRNA_df)), ]
   ## End of single nucleotide feature data frame creation
-  
+
   ## Get dinucleotide position features
   ## Splits each sgRNA into dinucleotides and adds them to a data frame
   for (x in 1:length(seqlist)) {
@@ -48,40 +44,42 @@ Doench_2016_processing <- function(seqlist) {
       di_sgRNA <- substr(seqlist, x, 1+x)
       di_split_sgRNA[[length(di_split_sgRNA)+1]] <- di_sgRNA
     }
-    di_split_sgRNA_df <- as.data.frame(di_split_sgRNA)
+    di_split_sgRNA_df <- data.frame(di_split_sgRNA)
+    if (length(seqlist) == 1) {
+      di_split_sgRNA_df <- t(di_split_sgRNA_df)
+    }
+  }
+  colnames(di_split_sgRNA_df) <- c(1:29)
+  di_nuc_list <- c("AA", "AC", "AG", "AT", "CA", "CC", "CG", "CT", "GA", "GC", "GG", "GT", "TA", "TC", "TG", "TT")
+  for (x in 1:length(di_nuc_list)){
+    ref_di <- t(as.data.frame((rep(di_nuc_list[x], 29))))
+    colnames(ref_di) <- c(1:29)
+    di_split_sgRNA_df <- rbind(di_split_sgRNA_df, ref_di)
   }
   ## Getting list of names for split_sgRNA_df and applying it
   di_split_names <- c()
   for (x in 1:29) {
     di_split_name <- paste("dnt_", x, sep = "")
-    di_split_names[[length(di_split_names)+1]] <- di_split_name 
+    di_split_names[[length(di_split_names)+1]] <- di_split_name
   }
   colnames(di_split_sgRNA_df) <- di_split_names
+  di_split_sgRNA_df <- as.data.frame(di_split_sgRNA_df)
   ## vtreat method of one hot encoding
   di_split_sgRNA_tplan <- vtreat::designTreatmentsZ(di_split_sgRNA_df, di_split_names, minFraction= 0, verbose=FALSE)
   ohe_di_split_sgRNA_df <- vtreat::prepare(di_split_sgRNA_tplan, di_split_sgRNA_df)
   ## Getting list of names for one hot encoded columns
-  di_nuc_list <- c("AA", "AC", "AG", "AT", "CA", "CC", "CG", "CT", "GA", "GC", "GG", "GT", "TA", "TC", "TG", "TT")
   ohe_di_split_names <- c()
   for (y in 1:29) {
     for (z in 1:16) {
       ohe_di_split_name <- paste("dnt_", y, "_lev_x_", di_nuc_list[z], sep = "")
       ohe_di_split_names[[length(ohe_di_split_names)+1]] <- ohe_di_split_name
-    }  
+    }
   }
-  ## Creating a reference data frame to prevent gaps (gap example: no guides have an "AT" at position 3)
-  ohe_di_split_sgRNA_ref_df <- data.frame(matrix(ncol = 464, nrow = 0))
-  colnames(ohe_di_split_sgRNA_ref_df) <- ohe_di_split_names
-  ## Merge the one hot encoded data frame with the reference data frame
-  ohe_di_split_sgRNA_df <- merge(ohe_di_split_sgRNA_ref_df, ohe_di_split_sgRNA_df, all = TRUE, sort = FALSE)
-  ## Replaces NA with 0's
-  ohe_di_split_sgRNA_df <- as.matrix(ohe_di_split_sgRNA_df)
-  ohe_di_split_sgRNA_df[is.na(ohe_di_split_sgRNA_df)] <- 0
-  ohe_di_split_sgRNA_df <- as.data.frame(ohe_di_split_sgRNA_df)
-  ## Reorders columns based on the list of names
-  ohe_di_split_sgRNA_df <- ohe_di_split_sgRNA_df[,ohe_di_split_names]
+  ohe_di_split_sgRNA_df <- ohe_di_split_sgRNA_df[ohe_di_split_names]
+  ohe_di_split_sgRNA_df <- ohe_di_split_sgRNA_df[-c((nrow(ohe_di_split_sgRNA_df)-15):nrow(ohe_di_split_sgRNA_df)), ]
+  di_split_sgRNA_df <- di_split_sgRNA_df[-c((nrow(di_split_sgRNA_df)-15):nrow(di_split_sgRNA_df)), ]
   ## End of dinucleotide feature data frame creation
-  
+
   ## Get position independent single nucleotide counts
   A_count <- c()
   C_count <- c()
@@ -95,7 +93,7 @@ Doench_2016_processing <- function(seqlist) {
   }
   single_nuc_count_frame <- data.frame(A_count, C_count, G_count, T_count)
   ## End of position independent single nucleotide features
-  
+
   ## Get position independent dinucleotide counts
   AA_count <- c()
   AC_count <- c()
@@ -135,9 +133,9 @@ Doench_2016_processing <- function(seqlist) {
                                    CA_count, CC_count, CG_count, CT_count,
                                    GA_count, GC_count, GG_count, GT_count,
                                    TA_count, TC_count, TG_count, TT_count)
-  
+
   ## End of position independent dinucleotide features
-  
+
   ## Get GC content of the 20-mer sgRNA sequence
   ## Three features are extracted, one for the GC content and two more for deviations above and below 10
   GC_content <- c()
@@ -159,12 +157,13 @@ Doench_2016_processing <- function(seqlist) {
   }
   GC_count_frame <- data.frame(GC_content, GC_content_grt_10, GC_content_lss_10)
   ## End of GC count Features
-  
+
   ## Get features for the two nucleotides surrounding the PAM
   PAM_neighbor <- c()
   for (x in 1:length(seqlist)) {
     PAM_neighbor[[length(PAM_neighbor)+1]] <- paste(substr(seqlist[x], 25, 25), substr(seqlist[x], 28, 28), sep = "")
   }
+  PAM_neighbor <- c(PAM_neighbor, di_nuc_list)
   ## Put list into a data frame
   PAM_neighbor_df <- as.data.frame(PAM_neighbor)
   ## vtreat method of one hot encoding
@@ -175,20 +174,11 @@ Doench_2016_processing <- function(seqlist) {
   for (z in 1:16) {
     ohe_PAM_neighbor_name <- paste("PAM_neighbor_lev_x_", di_nuc_list[z], sep = "")
     ohe_PAM_neighbor_names[[length(ohe_PAM_neighbor_names)+1]] <- ohe_PAM_neighbor_name
-  } 
-  ## Creating a reference data frame to prevent gaps (gap example: no guides have an "AT" at position 3)
-  ohe_PAM_neighbor_ref_df <- data.frame(matrix(ncol = 16, nrow = 0))
-  colnames(ohe_PAM_neighbor_ref_df) <- ohe_PAM_neighbor_names
-  ## Merge the one hot encoded data frame with the reference data frame
-  ohe_PAM_neighbor_df <- merge(ohe_PAM_neighbor_ref_df, ohe_PAM_neighbor_df, all = TRUE, sort = FALSE)
-  ## Replaces NA with 0's
-  ohe_PAM_neighbor_df <- as.matrix(ohe_PAM_neighbor_df)
-  ohe_PAM_neighbor_df[is.na(ohe_PAM_neighbor_df)] <- 0
-  ohe_PAM_neighbor_df <- as.data.frame(ohe_PAM_neighbor_df)
-  ## Reorders columns based on the list of names
-  ohe_PAM_neighbor_df <- ohe_PAM_neighbor_df[,ohe_PAM_neighbor_names]
+  }
+  ohe_PAM_neighbor_df <- ohe_PAM_neighbor_df[ohe_PAM_neighbor_names]
+  ohe_PAM_neighbor_df <- ohe_PAM_neighbor_df[-c((nrow(ohe_PAM_neighbor_df)-15):nrow(ohe_PAM_neighbor_df)), ]
   ## End of PAM neighbor features
-  
+
   ## Get Thermodynamic features function
   ## Four Thermodynamic features are extracted, one for the melting temp (Tm) of the 30-mer,
   ## one for the Tm of 5 nt proximal to the PAM, one for the Tm of the 8 nt proximal to the previous 5 nt (away from PAM),
@@ -248,12 +238,12 @@ Doench_2016_processing <- function(seqlist) {
   Tm_12_19 <- unlist(lapply(seqlist12_19, NN_Thermo))
   Tm_7_11 <- unlist(lapply(seqlist7_11, NN_Thermo))
   Tm_frame <- data.frame(Tm, Tm_20_24, Tm_12_19, Tm_7_11)
-  
+
   # Creating a single data frame to store all data
   final_data <- data.frame(ohe_split_sgRNA_df, ohe_di_split_sgRNA_df, single_nuc_count_frame, di_nuc_count_frame, GC_count_frame, ohe_PAM_neighbor_df, Tm_frame)
-  
+
   # Sets the columns that should be removed (nucleotide features that have to do with the PAM, thus no variation)
-  dropcolumns <- c("snt_26_lev_x_A", "snt_26_lev_x_C", "snt_26_lev_x_G", "snt_26_lev_x_T", 
+  dropcolumns <- c("snt_26_lev_x_A", "snt_26_lev_x_C", "snt_26_lev_x_G", "snt_26_lev_x_T",
                    "snt_27_lev_x_A", "snt_27_lev_x_C", "snt_27_lev_x_G","snt_27_lev_x_T",
                    "dnt_25_lev_x_AA", "dnt_25_lev_x_AC", "dnt_25_lev_x_AT",
                    "dnt_25_lev_x_CA", "dnt_25_lev_x_CC", "dnt_25_lev_x_CT",
