@@ -47,23 +47,23 @@ Example Data is located in /inst/ folder.
 
 The DAK1.fasta and DAK1_short.txt file contains a DNA sequence native to the DAK1 gene that can be copied and pasted into crispRdesignR or uploaded as a file (in the GUI version).
 
-The "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz" file is the compressed genome annotation file for Saccharomyces cerevisiae.
+The "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz" file is the compressed genome annotation file for Saccharomyces cerevisiae. Both compressed and uncompressed .gtf files can be used.
 
 Using the GUI version:
 
-`library(shiny)`
+- `library(shiny)`
 
-`library(crispRdesignR)`
+- `library(crispRdesignR)`
 
-`crispRdesignRUI()`
+- `crispRdesignRUI()`
 
-click on the “UseFASTA or txt file as target sequence” button and choose the DAK1.fasta or DAK1_short.txt file, or copy and paste the sequence in the box
+- Click on the “UseFASTA or txt file as target sequence” button and choose the DAK1.fasta or DAK1_short.txt file, or copy and paste the sequence in the box.
 
-select the Saccharomyces cerevisiae genome
+- select the Saccharomyces cerevisiae genome
 
-browse to choose the .gtf file Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz
+- browse to choose the .gtf file Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz
 
-click on the Find sgRNA button
+- click on the Find sgRNA button
 
 ![crisprdesignrss](https://user-images.githubusercontent.com/38253997/47938309-10169980-deba-11e8-83de-c00e4a6b72cd.PNG)
 
@@ -73,9 +73,9 @@ Note: Even though it might be possible to select them in the GUI, Genomes must b
 
 ## Command-line version
 
-##### sgRNA Design
+- Load crispRdesignR with `library(crispRdesignR)` and ensure that your genome of interest is installed and loaded. The following commands can be used to output the same data tables as in the GUI version.
 
-`library(crispRdesignR)`
+##### sgRNA Design
 
 All data can be generated without the graphic interface by using a single function: `sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE)`
 
