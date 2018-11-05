@@ -83,21 +83,21 @@ ui <- fluidPage(
 server <- function(input, output) {
   ## Increases the maximum file size that can be uploaded to Shiny to accomadate .gtf files
   options(shiny.maxRequestSize=150*1024^2)
-
+  
   ## Creates a list of reactive values that allows the program to
   ## update only when the action button is pressed
   maindf <- reactiveValues(data = NULL)
   offtargetdf <- reactiveValues(data = NULL)
-
+  
   ## Creates default values for the arguments in the find sgRNA function
   callofftargets <- "yes_off"
   annotateofftargets <- "yes_annotate"
   givenPAM <- "NGG"
-
+  
   ## Creates a variable for the gene annotation file
   gtf_datapath <<- 0
   gene_annotation_file <<- 0
-
+  
   ## Runs the sgRNA_design function when the action button is pressed
   observeEvent(input$run, {
     callofftargets <- input$'toggle_off_targets'
@@ -156,7 +156,7 @@ server <- function(input, output) {
         gene_annotation_file <<- import.gff(input$'gtf_file'$datapath)
       }
       all_data <- sgRNA_design_function(usersequence = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
-                               calloffs = callofftargets, annotateoffs = annotateofftargets)
+                                        calloffs = callofftargets, annotateoffs = annotateofftargets)
       if ((length(all_data) == 0) == FALSE) {
         int_sgRNA_data <- data.frame(all_data[1:14])
         colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
@@ -200,25 +200,25 @@ server <- function(input, output) {
       ))
     }
   })
-
+  
   output$Download_sgRNA <- downloadHandler(
     filename = function(){"sgRNA.csv"},
     content = function(file) {
       write.csv(maindf$sgRNA_data, file, row.names = TRUE)
     }
   )
-
+  
   output$Download_off <- downloadHandler(
     filename = function(){"Offtarget.csv"},
     content = function(file) {
       write.csv(offtargetdf$data, file, row.names = TRUE)
     }
   )
-
+  
   ## Reactively outputs an sgRNA table when the function is complete
   output$sgRNA_data <- renderDataTable(maindf$sgRNA_data)
   output$offtarget_data <- renderDataTable(offtargetdf$data)
-
+  
   ## Add fasta file input to the UI
   observeEvent(input$fasta, {
     if (input$fasta == TRUE) {
@@ -237,7 +237,7 @@ server <- function(input, output) {
       )
     }
   })
-
+  
   ## Add Additional Options input to the UI
   observeEvent(input$options_toggle, {
     if (input$options_toggle == TRUE) {
@@ -264,7 +264,7 @@ server <- function(input, output) {
       )
     }
   })
-
+  
 }
 
 shinyApp(ui=ui, server=server)
