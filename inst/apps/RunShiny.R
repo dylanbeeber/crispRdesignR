@@ -119,12 +119,17 @@ server <- function(input, output) {
       annotateofftargets <- "yes_annotate"
     }
     if (input$'fasta' == TRUE) {
-      if (isTRUE(class(try(import(input$'fastafile'$datapath, format = "fasta"))) == "DNAStringSet")) {
+      if (grep("*.fasta", input$'fastafile'$datapath) == 1) {
         sequence <- import(input$'fastafile'$datapath, format = "fasta")
         sequence <- as.character(sequence)
-      } else {
+      } else if (grep("*.txt", input$'fastafile'$datapath) == 1) {
         sequence <- read.table(input$'fastafile'$datapath)
         sequence <- paste(sequence[1:nrow(sequence), 1], collapse = "")
+      } else {
+        showModal(modalDialog(
+          title = "Error",
+          "Unsuported Target Sequence File Type"
+        ))
       }
     } else {
       sequence <- paste(input$'sequence', collapse = "")
