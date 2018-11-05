@@ -51,7 +51,9 @@ The "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz" file is the compressed genome a
 
 Using the GUI version:
 
-`library(gbm,vtreat,shiny,cripsRdesignR ….)
+`library(shiny)`
+
+`library(crispRdesignR)`
 
 `crispRdesignRUI()`
 
