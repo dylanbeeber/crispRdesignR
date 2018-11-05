@@ -75,6 +75,8 @@ Note: Even though it might be possible to select them in the GUI, Genomes must b
 
 ##### sgRNA Design
 
+`library(crispRdesignR)`
+
 All data can be generated without the graphic interface by using a single function: `sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE)`
 
 `userseq`: The target sequence to generate sgRNA guides for. Can either be a character sequence containing DNA bases or the name of a fasta/text file in the working directory.
