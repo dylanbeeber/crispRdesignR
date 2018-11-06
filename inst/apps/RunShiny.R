@@ -119,10 +119,10 @@ server <- function(input, output) {
       annotateofftargets <- "yes_annotate"
     }
     if (input$'fasta' == TRUE) {
-      if (grep("*.fasta", input$'fastafile'$datapath) == 1) {
+      if (isTRUE(grep("*.fasta", input$'fastafile'$datapath) == 1)) {
         sequence <- import(input$'fastafile'$datapath, format = "fasta")
         sequence <- as.character(sequence)
-      } else if (grep("*.txt", input$'fastafile'$datapath) == 1) {
+      } else if (isTRUE(grep("*.txt", input$'fastafile'$datapath) == 1)) {
         sequence <- read.table(input$'fastafile'$datapath)
         sequence <- paste(sequence[1:nrow(sequence), 1], collapse = "")
       } else {
