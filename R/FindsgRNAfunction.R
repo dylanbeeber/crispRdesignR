@@ -196,7 +196,7 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
           usepattern <- DNAString(paste(substr(as.character(pattern), 1, 20), setPAM, sep ="", collapse =""))
           subject <- usegenome[[seqname]]
           ## Searches for off-targets in the forward strand
-          off_info <- matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = FALSE)
+          off_info <- matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
           ## Excludes off-targets that contain invalid "NGG" PAMs
           if (setPAM == "NGG") {
             off_info_position <- c()
@@ -212,7 +212,7 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
           mis_info <- mismatch(usepattern, off_info, fixed = FALSE)
           ## Searches for off-targets in the reverse strand
           rev_pattern <- reverseComplement(usepattern)
-          rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = FALSE)
+          rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
           ## Excludes off-targets that contain invalid "NGG" PAMs
           if (setPAM == "NGG") {
             rev_off_info_position <- c()
