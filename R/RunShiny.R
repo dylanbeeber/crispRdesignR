@@ -187,7 +187,7 @@ server <- function(input, output) {
               selector = "#placeholder4",
               where = "afterEnd",
               ui = tags$div(id = 'sgRNAofftext',
-                            titlePanel("Potential Off-target Information"),
+                            titlePanel("Off-target Information"),
                             column(12, "Note: this program may report sequences in the target region as potential off-target sequences"),
                             downloadButton("Download_off", "Download Off-Targets")
               )
