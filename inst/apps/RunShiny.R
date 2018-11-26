@@ -147,50 +147,63 @@ server <- function(input, output) {
       } else {
         annotating <- TRUE
       }
-      if ((annotating != FALSE) & (gtf_datapath == 0)) {
-        gtf_datapath <<- input$'gtf_file'$datapath
-        gene_annotation_file <<- import.gff(input$'gtf_file'$datapath)
+      if (annotating == FALSE) {
+        gene_annotation_file <<- "placeholder"
       }
-      if ((gtf_datapath != input$'gtf_file'$datapath) & (annotating != FALSE)) {
-        gtf_datapath <<- input$'gtf_file'$datapath
-        gene_annotation_file <<- import.gff(input$'gtf_file'$datapath)
-      }
-      all_data <- sgRNA_design_function(usersequence = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
-                                        calloffs = callofftargets, annotateoffs = annotateofftargets)
-      if ((length(all_data) == 0) == FALSE) {
-        int_sgRNA_data <- data.frame(all_data[1:14])
-        colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
-                                      "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
-        if (input$run == 1) {
-          insertUI(
-            selector = "#placeholder3",
-            where = "afterEnd",
-            ui = tags$div(id = 'sgRNAdftext',
-                          titlePanel("sgRNA Table"),
-                          downloadButton("Download_sgRNA", "Download sgRNA")
-            )
-          )
+      if ((annotating =! FALSE) & ((is.null(input$'gtf_file'$datapath)) == FALSE)) {
+        if ((annotating != FALSE) & (gtf_datapath == 0)) {
+          gtf_datapath <<- input$'gtf_file'$datapath
+          gene_annotation_file <<- import.gff(input$'gtf_file'$datapath)
         }
-        maindf$sgRNA_data <- int_sgRNA_data
-        int_offtarget_data <- data.frame(all_data[15:26])
-        colnames(int_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
-                                          "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
-        if (input$run == 1) {
-          insertUI(
-            selector = "#placeholder4",
-            where = "afterEnd",
-            ui = tags$div(id = 'sgRNAofftext',
-                          titlePanel("Potential Off-target Information"),
-                          column(12, "Note: this program may report sequences in the target region as potential off-target sequences"),
-                          downloadButton("Download_off", "Download Off-Targets")
-            )
-          )
+        if (annotating != FALSE) {
+          if (gtf_datapath != input$'gtf_file'$datapath) {
+            gtf_datapath <<- input$'gtf_file'$datapath
+            gene_annotation_file <<- import.gff(input$'gtf_file'$datapath)
+          }
         }
-        offtargetdf$data <- int_offtarget_data
+        ## Inititates sgRNA_design_function
+        all_data <- sgRNA_design_function(usersequence = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
+                                          calloffs = callofftargets, annotateoffs = annotateofftargets)
+        if ((length(all_data) == 0) == FALSE) {
+          int_sgRNA_data <- data.frame(all_data[1:14])
+          colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
+                                        "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+          if (input$run == 1) {
+            insertUI(
+              selector = "#placeholder3",
+              where = "afterEnd",
+              ui = tags$div(id = 'sgRNAdftext',
+                            titlePanel("sgRNA Table"),
+                            downloadButton("Download_sgRNA", "Download sgRNA")
+              )
+            )
+          }
+          maindf$sgRNA_data <- int_sgRNA_data
+          int_offtarget_data <- data.frame(all_data[15:26])
+          colnames(int_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
+                                            "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
+          if (input$run == 1) {
+            insertUI(
+              selector = "#placeholder4",
+              where = "afterEnd",
+              ui = tags$div(id = 'sgRNAofftext',
+                            titlePanel("Off-target Information"),
+                            column(12, "Note: this program may report sequences in the target region as potential off-target sequences"),
+                            downloadButton("Download_off", "Download Off-Targets")
+              )
+            )
+          }
+          offtargetdf$data <- int_offtarget_data
+        } else {
+          showModal(modalDialog(
+            title = "Error",
+            "No sgRNA were generated from sequence"
+          ))
+        }
       } else {
         showModal(modalDialog(
           title = "Error",
-          "No sgRNA were generated from sequence"
+          "Please provide a genome annotation file (.gtf)"
         ))
       }
     } else {
