@@ -16,16 +16,6 @@ Description: This package aims to provide all scientifically pertinent informati
   Matched Sequence, Gene ID, Gene Name, Sequence Type, and Exon Number).
 License: GNU General Public License
 Encoding: UTF-8
-Imports: 
-  Biostrings,
-  gbm,
-  GenomicRanges,
-  IRanges,
-  rtracklayer,
-  stringr,
-  vtreat
-Suggests: 
-  Shiny,
-  BSgenome.Hsapiens.UCSC.hg19,
-  BSgenome.Scerevisiae.UCSC.sacCer2
+Imports: Biostrings, gbm, GenomicRanges, IRanges, rtracklayer, stringr, vtreat
+Suggests: Shiny, BSgenome.Hsapiens.UCSC.hg19, BSgenome.Scerevisiae.UCSC.sacCer2
 LazyData: true
