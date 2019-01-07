@@ -34,8 +34,11 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
   ## only 20 nucleotides long, nucleotides surrounding the sgRNA
   ## are used for study-based scoring
   setPAM <- userPAM
+  revsetPAM <- reverseComplement(DNAString(userPAM))
+  lengthPAM <- nchar(setPAM)
   usesetPAM <- str_replace_all(setPAM, "N", ".")
-  lengthpostPAM <- (6 - nchar(usesetPAM))
+  revusesetPAM <- str_replace_all(revsetPAM, "N", ".")
+  lengthpostPAM <- (6 - lengthPAM)
   PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
   ## Searches all 23 nt streches in the sequence for
   ## possible matches to the PAM, then puts entire 30 nt
@@ -181,6 +184,8 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
       PAM_test_list <- c("GG", "AG", "CG", "GA", "GC", "GT", "TG")
       rev_PAM_test_list <- c("CC", "CT", "CG", "TC", "GC", "AC", "CA")
       for (seqname in seqnames) {
+        subject <- usegenome[[seqname]]
+        #chrom_as_char <- as.character(subject)
         designprogress$inc(amount = (1/nseq)*.5, message = paste("Checking for Off-Targets in", seqname, sep = " "))
         chrmm0_list <- c()
         chrmm1_list <- c()
@@ -193,65 +198,87 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
         revchrmm3_list <- c()
         revchrmm4_list <- c()
         for (pattern in Biostrings_sgRNA) {
-          usepattern <- DNAString(paste(substr(as.character(pattern), 1, 20), setPAM, sep ="", collapse =""))
-          subject <- usegenome[[seqname]]
+          ### usepattern <- DNAString(paste(substr(as.character(pattern), 1, 20), setPAM, sep ="", collapse =""))
+          usepattern <- DNAString(substr(as.character(pattern), 1, 20))
           ## Searches for off-targets in the forward strand
-          off_info <- matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
-          ## Excludes off-targets that contain invalid "NGG" PAMs
-          if (setPAM == "NGG") {
-            off_info_position <- c()
-            if (length(off_info) > 0) {
-              for (f in 1:length(off_info)) {
-                if (substr(as.character(off_info[[f]]), 22, 23) %in% PAM_test_list) {
-                  off_info_position[[length(off_info_position)+1]] <- f
-                }
-              }
+          ### off_info <- matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
+          off_info <- matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = TRUE)
+          if (length(off_info) > 0) {
+            off_info_full <- Views(subject, start(off_info), end(off_info)+lengthPAM)
+            if (setPAM == "NGG") {
+              off_info_position <- which(substr(as.character(off_info_full), 22, 23) %in% PAM_test_list)
+              off_info <- off_info[off_info_position]
+              off_info_full <- off_info_full[off_info_position]
+            } else {
+              off_info_position <- which(str_detect(substr(as.character(off_info_full), 21, 20+lengthPAM), usesetPAM))
+              off_info <- off_info[off_info_position]
+              off_info_full <- off_info_full[off_info_position]
             }
-            off_info <- off_info[off_info_position]
           }
-          mis_info <- mismatch(usepattern, off_info, fixed = FALSE)
+          mis_info <- nmismatch(usepattern, off_info)
+          if (length(off_info) > 0) {
+            seqs_w_4mm <- which(mis_info == 4)
+            seqs_w_off_PAM <- which(substr(as.character(off_info_full), 22, 23) %in% c("AG", "CG", "GA", "GC", "GT", "TG"))
+            discard_offs <- intersect(seqs_w_4mm, seqs_w_off_PAM)
+            if (length(discard_offs) != 0) {
+              off_info <- off_info[-discard_offs]
+              off_info_full <- off_info_full[-discard_offs]
+              mis_info <- mis_info[-discard_offs]
+            }
+          }
           ## Searches for off-targets in the reverse strand
           rev_pattern <- reverseComplement(usepattern)
-          rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
-          ## Excludes off-targets that contain invalid "NGG" PAMs
-          if (setPAM == "NGG") {
-            rev_off_info_position <- c()
-            if (length(rev_off_info) > 0) {
-              for (f in 1:length(rev_off_info)) {
-                if (substr(as.character(rev_off_info[[f]]), 1, 2) %in% rev_PAM_test_list) {
-                  rev_off_info_position[[length(rev_off_info_position)+1]] <- f
-                }
-              }
+          ####rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
+          rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = TRUE)
+          if (length(rev_off_info) > 0) {
+            rev_off_info_full <- Views(subject, (start(rev_off_info)-lengthPAM), end(rev_off_info))
+            if (setPAM == "NGG") {
+              rev_off_info_position <- which(substr(as.character(rev_off_info_full), 1, 2) %in% rev_PAM_test_list)
+              rev_off_info <- rev_off_info[rev_off_info_position]
+              rev_off_info_full <- rev_off_info_full[rev_off_info_position]
+            } else {
+              rev_off_info_position <- which(str_detect(substr(as.character(rev_off_info_full), 1, lengthPAM), revusesetPAM))
+              rev_off_info <- rev_off_info[rev_off_info_position]
+              rev_off_info_full <- rev_off_info_full[rev_off_info_position]
             }
-            rev_off_info <- rev_off_info[rev_off_info_position]
           }
-          rev_mis_info <- mismatch(rev_pattern, rev_off_info, fixed = FALSE)
+          rev_mis_info <- nmismatch(rev_pattern, rev_off_info)
+          if (length(rev_mis_info) > 0) {
+            rev_seqs_w_4mm <- which(rev_mis_info == 4)
+            rev_seqs_w_off_PAM <- which(substr(as.character(rev_off_info_full), 1, 2) %in% c("CT", "CG", "TC", "GC", "AC", "CA"))
+            rev_discard_offs <- intersect(rev_seqs_w_4mm, rev_seqs_w_off_PAM)
+            if (length(rev_discard_offs) != 0) {
+              rev_off_info <- rev_off_info[-rev_discard_offs]
+              rev_off_info_full <- rev_off_info_full[-rev_discard_offs]
+              rev_mis_info <- rev_mis_info[-rev_discard_offs]
+            }
+          }
           if (length(off_info) > 0) {
             for (f in 1:length(off_info)) {
               off_start[[length(off_start)+1]] <- start(off_info)[f]
-              off_end[[length(off_end)+1]] <- end(off_info)[f]
+              off_end[[length(off_end)+1]] <- end(off_info)[f]+lengthPAM
               off_direction[[length(off_direction)+1]] <- "+"
               off_chr[[length(off_chr)+1]] <- seqname
-              off_mismatch[[length(off_mismatch)+1]] <- length(mis_info[[f]])
+              off_mismatch[[length(off_mismatch)+1]] <- mis_info[f]
               off_sgRNAseq[[length(off_sgRNAseq)+1]] <- as.character(pattern)
-              off_offseq[[length(off_offseq)+1]] <- as.character(off_info[[f]])
+              off_offseq[[length(off_offseq)+1]] <- as.character(off_info_full[f])
             }
           }
           if (length(rev_off_info) > 0) {
             for (f in 1:length(rev_off_info)) {
-              off_start[[length(off_start)+1]] <- start(rev_off_info)[f]
+              off_start[[length(off_start)+1]] <- start(rev_off_info)[f]-lengthPAM
               off_end[[length(off_end)+1]] <- end(rev_off_info)[f]
               off_direction[[length(off_direction)+1]] <- "-"
               off_chr[[length(off_chr)+1]] <- seqname
-              off_mismatch[[length(off_mismatch)+1]] <- length(rev_mis_info[[f]])
+              off_mismatch[[length(off_mismatch)+1]] <- rev_mis_info[f]
               off_sgRNAseq[[length(off_sgRNAseq)+1]] <- as.character(pattern)
-              off_offseq[[length(off_offseq)+1]] <- as.character(rev_off_info[[f]])
+              off_offseq[[length(off_offseq)+1]] <- as.character(rev_off_info_full[f])
             }
           }
           individMM <- c()
           if (length(mis_info) > 0) {
             for (f in 1:length(mis_info)) {
-              individMM[[length(individMM)+1]] <- length(mis_info[[f]])
+              individMM[[length(individMM)+1]] <- mis_info[f]
             }
             chrmm0_list[[length(chrmm0_list)+1]] <- sum(individMM == 0)
             chrmm1_list[[length(chrmm1_list)+1]] <- sum(individMM == 1)
@@ -268,7 +295,7 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
           individMM <- c()
           if (length(rev_mis_info) > 0) {
             for (f in 1:length(rev_mis_info)) {
-              individMM[[length(individMM)+1]] <- length(rev_mis_info[[f]])
+              individMM[[length(individMM)+1]] <- rev_mis_info[f]
             }
             revchrmm0_list[[length(revchrmm0_list)+1]] <- sum(individMM == 0)
             revchrmm1_list[[length(revchrmm1_list)+1]] <- sum(individMM == 1)
