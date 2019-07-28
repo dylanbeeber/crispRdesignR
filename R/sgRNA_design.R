@@ -403,6 +403,17 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
           more_off_info <- data.frame(geneidlist, genenamelist, sequencetypelist, exonnumberlist)
           more_off_info
         }
+        ## Ensures that all off-targets provided run in the same direction as the sgRNA sequence
+        revcomp_index <- which(off_direction == "-")
+        to_be_revcomped <- c(off_offseq[revcomp_index])
+        new_offs <- c()
+        x <- 1
+        for (x in 1:length(to_be_revcomped)) {
+          new_offs[[length(new_offs)+1]] <- as.character(reverseComplement(DNAString(to_be_revcomped[x])))
+        }
+        for (x in 1:length(revcomp_index)) {
+          off_offseq[revcomp_index[x]] <- new_offs[x]
+        }
         ## Compiles data frame of all off-target annotations
         more_off_info <- annotate_genome(off_chr, off_start, off_end, off_direction, gtfname)
         ## Complies all extra sgRNA info into a separate data frame
