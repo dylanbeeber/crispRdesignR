@@ -65,7 +65,7 @@ Using the GUI version:
 
 - click on the Find sgRNA button
 
-![crisprdesignrss](https://user-images.githubusercontent.com/38253997/47938309-10169980-deba-11e8-83de-c00e4a6b72cd.PNG)
+![crisprdesignrss](https://user-images.githubusercontent.com/38253997/65398118-7a128880-dd83-11e9-8b7e-78824723059f.PNG)
 
 Additional Genome annotation files can be found here: https://useast.ensembl.org/info/data/ftp/index.html
 
