@@ -150,7 +150,12 @@ server <- function(input, output) {
       if (annotating == FALSE) {
         gene_annotation_file <<- "placeholder"
       }
-      if ((annotating =! FALSE) & ((is.null(input$'gtf_file'$datapath)) == FALSE)) {
+      if ((annotating == TRUE) & ((is.null(input$'gtf_file'$datapath)) == TRUE)) {
+        showModal(modalDialog(
+          title = "Error",
+          "Please provide a genome annotation file (.gtf.gz)"
+        ))
+      } else {
         if ((annotating != FALSE) & (gtf_datapath == 0)) {
           gtf_datapath <<- input$'gtf_file'$datapath
           gene_annotation_file <<- import.gff(input$'gtf_file'$datapath)
@@ -200,12 +205,6 @@ server <- function(input, output) {
             "No sgRNA were generated from sequence"
           ))
         }
-      } else {
-        showModal(modalDialog(
-          title = "Error",
-          "Please provide a genome annotation file (.gtf)"
-        ))
-      }
     } else {
       showModal(modalDialog(
         title = "Error",
