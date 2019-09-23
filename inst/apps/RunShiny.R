@@ -150,7 +150,7 @@ server <- function(input, output) {
       if (annotating == FALSE) {
         gene_annotation_file <<- "placeholder"
       }
-      if ((annotating == TRUE) & ((is.null(input$'gtf_file'$datapath)) == TRUE)) {
+      if ((annotating == TRUE) & (is.null(input$'gtf_file'$datapath) == TRUE)) {
         showModal(modalDialog(
           title = "Error",
           "Please provide a genome annotation file (.gtf.gz)"
@@ -168,7 +168,7 @@ server <- function(input, output) {
         }
         ## Inititates sgRNA_design_function
         all_data <- sgRNA_design_function(usersequence = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
-                                          calloffs = callofftargets, annotateoffs = annotateofftargets)
+                                           calloffs = callofftargets, annotateoffs = annotateofftargets)
         if ((length(all_data) == 0) == FALSE) {
           int_sgRNA_data <- data.frame(all_data[1:14])
           colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
@@ -205,6 +205,7 @@ server <- function(input, output) {
             "No sgRNA were generated from sequence"
           ))
         }
+      }
     } else {
       showModal(modalDialog(
         title = "Error",
