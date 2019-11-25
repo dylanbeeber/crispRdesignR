@@ -9,13 +9,15 @@ This software aims to provide all scientifically pertinent information when desi
 
 Steps to install crispRdesignR (tested in R version 3.4.4):
 
-##### dependencies gbm, vtreat and stringr:
+##### dependencies gbm, vtreat, stringr, DT:
 
 `install.packages("gbm")`
 
 `install.packages("vtreat")`
 
 `install.packages("stringr", repos='http://cran.us.r-project.org')`
+
+`install.packages("DT")`
 
 ##### dependencies shiny, for the user interface
 
