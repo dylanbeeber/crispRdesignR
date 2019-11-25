@@ -185,7 +185,6 @@ server <- function(input, output) {
             )
           }
           maindf$sgRNA_data <- int_sgRNA_data
-          reactive(maindf$sgRNA_data)
           int_offtarget_data <- data.frame(all_data[15:26])
           colnames(int_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
                                             "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
@@ -201,7 +200,6 @@ server <- function(input, output) {
             )
           }
           offtargetdf$data <- int_offtarget_data
-          reactive(offtargetdf$data)
         } else {
           showModal(modalDialog(
             title = "Error",
