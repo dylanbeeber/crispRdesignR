@@ -436,6 +436,22 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
         for (x in 1:length(revcomp_index)) {
           off_offseq[revcomp_index[x]] <- new_offs[x]
         }
+        ## Adds code to color mismatches red within the off target sequences
+        for (x in 1:length(off_offseq)) {
+          justsgRNA <- off_sgRNAseq[x]
+          justoff <- off_offseq[x]
+          splitjustsgRNA <- str_split(justsgRNA, "", simplify = TRUE)
+          splitoffsgRNA <- str_split(justoff, "", simplify = TRUE)
+          mismatches <- which(splitjustsgRNA != splitoffsgRNA)
+          splitlistoffsgRNA <- as.list(splitoffsgRNA)
+          if (length(mismatches) != 0){
+            for (g in length(mismatches):1) {
+              splitlistoffsgRNA <- append(splitlistoffsgRNA, '</span>', after = mismatches[g])
+              splitlistoffsgRNA <- append(splitlistoffsgRNA, '<span style="color:red">', after = mismatches[g]-1)
+            }
+            off_offseq[x] <- paste(splitlistoffsgRNA, sep="", collapse = "")
+          }
+        }
         ## Compiles data frame of all off-target annotations
         more_off_info <- annotate_genome(off_chr, off_start, off_end, off_direction, gtf)
         designprogress$inc(amount = 1/10, message = "Compiling Data")
