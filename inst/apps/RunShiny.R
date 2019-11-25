@@ -26,6 +26,7 @@ library(IRanges)
 library(GenomicRanges)
 library(rtracklayer)
 library(Biostrings)
+library(DT)
 #library(BSgenome.Hsapiens.UCSC.hg19)
 #library(BSgenome.Hsapiens.UCSC.hg38)
 #library(BSgenome.Scerevisiae.UCSC.sacCer2)
@@ -65,9 +66,9 @@ ui <- fluidPage(
                         ),
                         mainPanel(
                           tags$div(id = "placeholder3"),
-                          dataTableOutput("sgRNA_data"),
+                          DT::dataTableOutput("sgRNA_data"),
                           tags$div(id = "placeholder4"),
-                          dataTableOutput("offtarget_data"),
+                          DT::dataTableOutput("offtarget_data"),
                           titlePanel("About"),
                           column(12, HTML("The Cas9 Guide Finder designs guide RNA sequences (sgRNA) for Cas9 DNA editing.
                                           To begin, enter a sequence into the sequence box, select a genome to search for
@@ -184,6 +185,7 @@ server <- function(input, output) {
             )
           }
           maindf$sgRNA_data <- int_sgRNA_data
+          reactive(maindf$sgRNA_data)
           int_offtarget_data <- data.frame(all_data[15:26])
           colnames(int_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
                                             "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
@@ -199,6 +201,7 @@ server <- function(input, output) {
             )
           }
           offtargetdf$data <- int_offtarget_data
+          reactive(offtargetdf$data)
         } else {
           showModal(modalDialog(
             title = "Error",
@@ -229,8 +232,8 @@ server <- function(input, output) {
   )
   
   ## Reactively outputs an sgRNA table when the function is complete
-  output$sgRNA_data <- renderDataTable(maindf$sgRNA_data)
-  output$offtarget_data <- renderDataTable(offtargetdf$data)
+  output$sgRNA_data <- DT::renderDataTable({maindf$sgRNA_data}, escape = FALSE)
+  output$offtarget_data <- DT::renderDataTable({offtargetdf$data}, escape = FALSE)
   
   ## Add fasta file input to the UI
   observeEvent(input$fasta, {
