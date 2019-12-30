@@ -56,8 +56,8 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
     poss_sgRNA <- substr(rev_seq, x, 29+x)
     if (str_detect(poss_sgRNA, PAM) == TRUE){
       sgRNA_list_r[[length(sgRNA_list_r)+1]] <- poss_sgRNA
-      sgRNA_r_start[[length(sgRNA_r_start)+1]] <- nchar(rev_seq)-x+4
-      sgRNA_r_end[[length(sgRNA_r_end)+1]] <- nchar(rev_seq)-x+26
+      sgRNA_r_start[[length(sgRNA_r_start)+1]] <- nchar(rev_seq)-x-25
+      sgRNA_r_end[[length(sgRNA_r_end)+1]] <- nchar(rev_seq)-x-3
     }
   }
   ## Removes any sgRNA that contain degerate bases (what about gap characters?)
