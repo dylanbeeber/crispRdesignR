@@ -217,14 +217,16 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
             }
           }
           mis_info <- nmismatch(usepattern, off_info)
-          if (length(off_info) > 0) {
-            seqs_w_4mm <- which(mis_info == 4)
-            seqs_w_off_PAM <- which(substr(as.character(off_info_full), 22, 23) %in% c("AG", "CG", "GA", "GC", "GT", "TG"))
-            discard_offs <- intersect(seqs_w_4mm, seqs_w_off_PAM)
-            if (length(discard_offs) != 0) {
-              off_info <- off_info[-discard_offs]
-              off_info_full <- off_info_full[-discard_offs]
-              mis_info <- mis_info[-discard_offs]
+          if (setPAM == "NGG") {
+            if (length(off_info) > 0) {
+              seqs_w_4mm <- which(mis_info == 4)
+              seqs_w_off_PAM <- which(substr(as.character(off_info_full), 22, 23) %in% c("AG", "CG", "GA", "GC", "GT", "TG"))
+              discard_offs <- intersect(seqs_w_4mm, seqs_w_off_PAM)
+              if (length(discard_offs) != 0) {
+                off_info <- off_info[-discard_offs]
+                off_info_full <- off_info_full[-discard_offs]
+                mis_info <- mis_info[-discard_offs]
+              }
             }
           }
           ## Searches for off-targets in the reverse strand
@@ -244,14 +246,16 @@ sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress,
             }
           }
           rev_mis_info <- nmismatch(rev_pattern, rev_off_info)
-          if (length(rev_mis_info) > 0) {
-            rev_seqs_w_4mm <- which(rev_mis_info == 4)
-            rev_seqs_w_off_PAM <- which(substr(as.character(rev_off_info_full), 1, 2) %in% c("CT", "CG", "TC", "GC", "AC", "CA"))
-            rev_discard_offs <- intersect(rev_seqs_w_4mm, rev_seqs_w_off_PAM)
-            if (length(rev_discard_offs) != 0) {
-              rev_off_info <- rev_off_info[-rev_discard_offs]
-              rev_off_info_full <- rev_off_info_full[-rev_discard_offs]
-              rev_mis_info <- rev_mis_info[-rev_discard_offs]
+          if (setPAM == "NGG") {
+            if (length(rev_mis_info) > 0) {
+              rev_seqs_w_4mm <- which(rev_mis_info == 4)
+              rev_seqs_w_off_PAM <- which(substr(as.character(rev_off_info_full), 1, 2) %in% c("CT", "CG", "TC", "GC", "AC", "CA"))
+              rev_discard_offs <- intersect(rev_seqs_w_4mm, rev_seqs_w_off_PAM)
+              if (length(rev_discard_offs) != 0) {
+                rev_off_info <- rev_off_info[-rev_discard_offs]
+                rev_off_info_full <- rev_off_info_full[-rev_discard_offs]
+                rev_mis_info <- rev_mis_info[-rev_discard_offs]
+              }
             }
           }
           if (length(off_info) > 0) {
