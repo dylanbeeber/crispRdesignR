@@ -145,7 +145,9 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     ## Efficiency Score
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
     Efficiency_Score <- predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
-    ## Efficiency Score
+    ## Round that efficiency score to three decimal places
+    Efficiency_Score <- round(Efficiency_Score, 3)
+    ## Study-based efficiency score done
     if (calloffs == FALSE) {
       mm0_list <- rep("NA", each = length(sgRNA_list))
       mm1_list <- rep("NA", each = length(sgRNA_list))
