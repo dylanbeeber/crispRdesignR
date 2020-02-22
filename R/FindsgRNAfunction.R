@@ -219,7 +219,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
               off_info_full <- off_info_full[off_info_position]
             }
           }
-          mis_info <- Biostrings::mismatch(usepattern, off_info)
+          mis_info <- Biostrings::nmismatch(usepattern, off_info)
           if (setPAM == "NGG") {
             if (length(off_info) > 0) {
               seqs_w_4mm <- which(mis_info == 4)
@@ -248,7 +248,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
               rev_off_info_full <- rev_off_info_full[rev_off_info_position]
             }
           }
-          rev_mis_info <- Biostrings::mismatch(rev_pattern, rev_off_info)
+          rev_mis_info <- Biostrings::nmismatch(rev_pattern, rev_off_info)
           if (setPAM == "NGG") {
             if (length(rev_mis_info) > 0) {
               rev_seqs_w_4mm <- which(rev_mis_info == 4)
