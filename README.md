@@ -7,7 +7,7 @@ This software aims to provide all scientifically pertinent information when desi
 
 ## Installation and dependencies
 
-Steps to install crispRdesignR (tested in R version 3.4.4):
+Steps to install crispRdesignR (tested in R version 3.6.2):
 
 ##### dependencies gbm, vtreat, stringr, DT:
 
