@@ -1,7 +1,7 @@
 #' @export
 
 ## For this script to work properly, this script must be run from Shiny
-sgRNA_design_functionR <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
+sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
   requireNamespace("gbm")
   requireNamespace("Biostrings")
   designprogress$inc(1/10, message = "Finding sgRNA")
