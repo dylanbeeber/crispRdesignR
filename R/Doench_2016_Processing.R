@@ -1,3 +1,5 @@
+#' @export
+
 ## Data processing for Doench 2016 Rule Set 2
 ## Extracting info from Test Set
 ## Will output a data frame with all features listed in the study

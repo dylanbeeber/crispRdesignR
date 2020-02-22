@@ -1,12 +1,14 @@
+#' @export
+
 ## For this script to work properly, this script must be run from Shiny
-sgRNA_design_function <- function(usersequence, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
+sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
   designprogress$inc(1/10, message = "Finding sgRNA")
   ## Detects whether the user input is a .fasta
-  if (isTRUE(stringr::str_detect(usersequence, ".fasta"))){
-    Biostrings_sequence <- rtracklayer::import(usersequence)
+  if (isTRUE(stringr::str_detect(userseq, ".fasta"))){
+    Biostrings_sequence <- rtracklayer::import(userseq)
     sequence <- as.character(Biostrings_sequence)
   } else { ## Imports as a character string
-    sequence <- paste(usersequence, collapse = "")
+    sequence <- paste(userseq, collapse = "")
     sequence <- stringr::str_replace_all(sequence, stringr::fixed(" "), "")
     Biostrings_sequence <- Biostrings::DNAString(sequence)
   }
