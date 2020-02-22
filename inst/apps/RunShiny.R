@@ -130,7 +130,7 @@ server <- function(input, output) {
           }
         }
         ## Inititates sgRNA_design_function
-        all_data <- sgRNA_design_function(usersequence = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
+        all_data <- sgRNA_design_function(userseq = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
                                            calloffs = callofftargets, annotateoffs = annotateofftargets)
         if ((length(all_data) == 0) == FALSE) {
           int_sgRNA_data <- data.frame(all_data[1:14])
