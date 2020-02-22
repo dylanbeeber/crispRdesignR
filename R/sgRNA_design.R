@@ -1,3 +1,5 @@
+#' @export
+
 ## This function needs a genome (from BSgenome to check for off-targets in and
 ## a gtf file to annotate the offtargets)
 
@@ -6,26 +8,26 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     userPAM <- "NGG"
   }
   ## Detects whether the user input is a .fasta or .txt file
-  if (isTRUE(str_detect(userseq, ".fasta")) || (isTRUE(str_detect(userseq, ".txt")))) {
+  if (isTRUE(stringr::str_detect(userseq, ".fasta")) || (isTRUE(stringr::str_detect(userseq, ".txt")))) {
     ## Attempts to import as a .fasta file
-    if (isTRUE(class(try(import(userseq, format = "fasta"))) == "DNAStringSet")) {
-      Biostrings_sequence <- import(userseq, format = "fasta")
+    if (isTRUE(class(try(rtracklayer::import(userseq, format = "fasta"))) == "DNAStringSet")) {
+      Biostrings_sequence <- rtracklayer::import(userseq, format = "fasta")
       sequence <- as.character(Biostrings_sequence)
     } else { ## Imports as a text file
-      sequence <- read.table(userseq)
+      sequence <- utils::read.table(userseq)
       sequence <- paste(sequence[1:nrow(sequence), 1], collapse = "")
-      Biostrings_sequence <- DNAString(sequence)
+      Biostrings_sequence <- Biostrings::DNAString(sequence)
     }
   } else { ## Imports as a character string
     sequence <- paste(userseq, collapse = "")
-    sequence <- str_replace_all(sequence, fixed(" "), "")
-    Biostrings_sequence <- DNAString(sequence)
+    sequence <- stringr::str_replace_all(sequence, stringr::fixed(" "), "")
+    Biostrings_sequence <- Biostrings::DNAString(sequence)
   }
   print("Searching sequence for possible target sites")
   ## Creates a character string that contains the
   ## complementary sequence (Both in the reverse
   ## direction and with substituted nucleotides)
-  Biostrings_rev_seq <- reverseComplement(Biostrings_sequence)
+  Biostrings_rev_seq <- Biostrings::reverseComplement(Biostrings_sequence)
   rev_seq <- as.character(Biostrings_rev_seq)
   ## Create an empty list for the forward sgRNA to go
   sgRNA_list_f <- c()
@@ -49,7 +51,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
   if (setPAM != "NGG") {
     print("Warning: Doench efficiency scores are only accurate for NGG PAMs")
   }
-  usesetPAM <- str_replace_all(setPAM, "N", ".")
+  usesetPAM <- stringr::str_replace_all(setPAM, "N", ".")
   lengthpostPAM <- (6 - nchar(usesetPAM))
   PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
   ## Searches all 23 nt streches in the sequence for
@@ -57,7 +59,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
   ## matches into a list (including the PAM)
   for (x in 1:num_char_in_seq){
     poss_sgRNA <- substr(sequence, x, 29+x)
-    if (str_detect(poss_sgRNA, PAM) == TRUE){
+    if (stringr::str_detect(poss_sgRNA, PAM) == TRUE){
       sgRNA_list_f[[length(sgRNA_list_f)+1]] <- poss_sgRNA
       sgRNA_f_start[[length(sgRNA_f_start)+1]] <- x+4
       sgRNA_f_end[[length(sgRNA_f_end)+1]] <- x+26
@@ -66,7 +68,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
   ## Same as above but with the reverse sequence
   for (x in 1:num_char_in_seq){
     poss_sgRNA <- substr(rev_seq, x, 29+x)
-    if (str_detect(poss_sgRNA, PAM) == TRUE){
+    if (stringr::str_detect(poss_sgRNA, PAM) == TRUE){
       sgRNA_list_r[[length(sgRNA_list_r)+1]] <- poss_sgRNA
       sgRNA_r_start[[length(sgRNA_r_start)+1]] <- nchar(rev_seq)-x-25
       sgRNA_r_end[[length(sgRNA_r_end)+1]] <- nchar(rev_seq)-x-3
@@ -87,12 +89,12 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     ## Creates a list with only the sgRNA sequences (no PAMs or
     ## flanking sequence)
     breakseq <- function(seqlist){
-      str_sub(seqlist, 5, 24)
+      stringr::str_sub(seqlist, 5, 24)
     }
     sgRNA_seq <- sapply(sgRNA_list, breakseq)
     ## Creates a list with only the PAM sequences
     breakPAM <- function(seqlist){
-      str_sub(seqlist, 25, (24+nchar(setPAM)))
+      stringr::str_sub(seqlist, 25, (24+nchar(setPAM)))
     }
     sgRNA_PAM <- sapply(sgRNA_list, breakPAM)
     ## Makes a list of all of the sgRNA sequences with their PAM
@@ -104,37 +106,37 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     ## Find GC percentage for each sgRNA and puts that data into
     ## a list called "GCinstance"
     FindGC <- function(seqlist){
-      ((str_count(seqlist, "G") + str_count(seqlist, "C")) / 20)
+      ((stringr::str_count(seqlist, "G") + stringr::str_count(seqlist, "C")) / 20)
     }
     GCinstance <- sapply(sgRNA_seq, FindGC)
     ## Find homopolmers
     Findhomopolymer <- function(seqlist){
-      str_detect(seqlist, "TTTT|AAAA|GGGG|CCCC")
+      stringr::str_detect(seqlist, "TTTT|AAAA|GGGG|CCCC")
     }
     Homopolymerdetect <- sapply(sgRNA_seq, Findhomopolymer)
     Homopolymerdetect
     ## Detect Self complementarity
     self_comp_list <- c()
     ## Region of sgRNA backbone that is vulnerable to forming hairpins
-    backbone_area <- DNAString("AGGCTAGTCCGT")
-    revcomp_backbone <- reverseComplement(backbone_area)
+    backbone_area <- Biostrings::DNAString("AGGCTAGTCCGT")
+    revcomp_backbone <- Biostrings::reverseComplement(backbone_area)
     ## Creates a function to detect the GC content of 4 bp regions of the sgRNA
     SpeFindGC <- function(seqlist){
-      ((str_count(seqlist, "G") + str_count(seqlist, "C")) / 4)
+      ((stringr::str_count(seqlist, "G") + stringr::str_count(seqlist, "C")) / 4)
     }
     ## Process that detects hairpins within the sgRNA or with the backbone
     for (j in 1:length(sgRNA_seq)){
-      testDNA <- DNAString(sgRNA_seq[j])
-      revcompDNA <- reverseComplement(testDNA)
+      testDNA <- Biostrings::DNAString(sgRNA_seq[j])
+      revcompDNA <- Biostrings::reverseComplement(testDNA)
       individ_comp_list <- c()
       for (r in 1:17) {
         test_region <- substr(testDNA, r, r+3)
         if (SpeFindGC(test_region) >= .5) {
           if (r <= 10) {
-            compcount <- countPattern(test_region, reverseComplement(DNAString(substr(testDNA, r+7, length(testDNA)))))
+            compcount <- Biostrings::countPattern(test_region, Biostrings::reverseComplement(Biostrings::DNAString(substr(testDNA, r+7, length(testDNA)))))
             individ_comp_list[[length(individ_comp_list)+1]]  <- compcount
           }
-          compcount <- countPattern(test_region, revcomp_backbone)
+          compcount <- Biostrings::countPattern(test_region, revcomp_backbone)
           individ_comp_list[[length(individ_comp_list)+1]]  <- compcount
         } else {
           individ_comp_list[[length(individ_comp_list)+1]] <- 0
@@ -144,7 +146,8 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     } ## Self comp checking ends here
     ## Efficiency Score
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
-    Efficiency_Score <- predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
+    requireNamespace("gbm")
+    Efficiency_Score <- stats::predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
     ## Round that efficiency score to three decimal places
     Efficiency_Score <- round(Efficiency_Score, 3)
     ## Study-based efficiency score done
@@ -169,12 +172,12 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       ## Creates Function that converts all sgRNAs into a format readable
       ## by Biostrings
       multiple_DNAString <- function(seqlist){
-        DNAString(seqlist)
+        Biostrings::DNAString(seqlist)
       }
       Biostrings_sgRNA <- lapply(sgRNA_with_PAM, multiple_DNAString)
       ## Define genome
       usegenome <- genomename
-      seqnames <- seqnames(usegenome)
+      seqnames <- GenomeInfoDb::seqnames(usegenome)
       ## Creates a series of lists to store the incoming mismatch information
       mm0_list <- c()
       mm1_list <- c()
@@ -204,10 +207,10 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
         revchrmm3_list <- c()
         revchrmm4_list <- c()
         for (pattern in Biostrings_sgRNA) {
-          usepattern <- DNAString(paste(substr(as.character(pattern), 1, 20), setPAM, sep ="", collapse =""))
+          usepattern <- Biostrings::DNAString(paste(substr(as.character(pattern), 1, 20), setPAM, sep ="", collapse =""))
           subject <- usegenome[[seqname]]
           ## Searches for off-targets in the forward strand
-          off_info <- matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
+          off_info <- Biostrings::matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
           ## Excludes off-targets that contain invalid "NGG" PAMs
           if (setPAM == "NGG") {
             off_info_position <- c()
@@ -220,10 +223,10 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
             }
             off_info <- off_info[off_info_position]
           }
-          mis_info <- mismatch(usepattern, off_info, fixed = FALSE)
+          mis_info <- Biostrings::mismatch(usepattern, off_info, fixed = FALSE)
           ## Searches for off-targets in the reverse strand
-          rev_pattern <- reverseComplement(usepattern)
-          rev_off_info <- matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
+          rev_pattern <- Biostrings::reverseComplement(usepattern)
+          rev_off_info <- Biostrings::matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
           ## Excludes off-targets that contain invalid "NGG" PAMs
           if (setPAM == "NGG") {
             rev_off_info_position <- c()
@@ -236,11 +239,11 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
             }
             rev_off_info <- rev_off_info[rev_off_info_position]
           }
-          rev_mis_info <- mismatch(rev_pattern, rev_off_info, fixed = FALSE)
+          rev_mis_info <- Biostrings::mismatch(rev_pattern, rev_off_info, fixed = FALSE)
           if (length(off_info) > 0) {
             for (f in 1:length(off_info)) {
-              off_start[[length(off_start)+1]] <- start(off_info)[f]
-              off_end[[length(off_end)+1]] <- end(off_info)[f]
+              off_start[[length(off_start)+1]] <- BiocGenerics::start(off_info)[f]
+              off_end[[length(off_end)+1]] <- BiocGenerics::end(off_info)[f]
               off_direction[[length(off_direction)+1]] <- "+"
               off_chr[[length(off_chr)+1]] <- seqname
               off_mismatch[[length(off_mismatch)+1]] <- length(mis_info[[f]])
@@ -250,8 +253,8 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
           }
           if (length(rev_off_info) > 0) {
             for (f in 1:length(rev_off_info)) {
-              off_start[[length(off_start)+1]] <- start(rev_off_info)[f]
-              off_end[[length(off_end)+1]] <- end(rev_off_info)[f]
+              off_start[[length(off_start)+1]] <- BiocGenerics::start(rev_off_info)[f]
+              off_end[[length(off_end)+1]] <- BiocGenerics::end(rev_off_info)[f]
               off_direction[[length(off_direction)+1]] <- "-"
               off_chr[[length(off_chr)+1]] <- seqname
               off_mismatch[[length(off_mismatch)+1]] <- length(rev_mis_info[[f]])
@@ -315,13 +318,13 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       CFD_Scores <- c()
       for (x in 1:length(off_offseq)) {
         if (off_direction[x] == "-") {
-          temporary_off <- DNAString(off_offseq[x])
-          temporary_off <- reverseComplement(temporary_off)
-          CFDoffsplit <- str_split(temporary_off, "", simplify = TRUE)
+          temporary_off <- Biostrings::DNAString(off_offseq[x])
+          temporary_off <- Biostrings::reverseComplement(temporary_off)
+          CFDoffsplit <- stringr::str_split(temporary_off, "", simplify = TRUE)
         } else {
-          CFDoffsplit <- str_split(off_offseq[x], "", simplify = TRUE)
+          CFDoffsplit <- stringr::str_split(off_offseq[x], "", simplify = TRUE)
         }
-        CFDsgRNAsplit <- str_split(off_sgRNAseq[x], "", simplify = TRUE)
+        CFDsgRNAsplit <- stringr::str_split(off_sgRNAseq[x], "", simplify = TRUE)
         individ_scores <- c()
         for (g in 1:20) {
           if (CFDsgRNAsplit[g] != CFDoffsplit[g]) {
@@ -362,14 +365,14 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       } else {
         ## Creates a function that annotates the off-targets called above
         annotate_genome <- function(ochr, ostart, oend, odir, gtfname) {
-          gtf <- import(gtfname)
-          seqlevelsStyle(gtf) <- "UCSC"
+          gtf <- rtracklayer::import(gtfname)
+          GenomeInfoDb::seqlevelsStyle(gtf) <- "UCSC"
           seqer <- unlist(ochr)
           starter <- as.numeric(ostart)
           ender <- as.numeric(unlist(oend))
           strander <- unlist(odir)
-          off_ranges <- GRanges(seqer, IRanges(starter, ender), strander)
-          olaps <- findOverlaps(off_ranges, gtf)
+          off_ranges <- GenomicRanges::GRanges(seqer, IRanges::IRanges(starter, ender), strander)
+          olaps <- IRanges::findOverlaps(off_ranges, gtf)
           geneid <- c()
           geneidlist <- c()
           genename <- c()
@@ -378,19 +381,19 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
           sequencetypelist <- c()
           exonnumber <- c()
           exonnumberlist <- c()
-          mcols(off_ranges)$gene_id <- c()
+          S4Vectors::mcols(off_ranges)$gene_id <- c()
           for (p in 1:length(off_ranges)) {
-            if (p %in% queryHits(olaps)) {
-              geneid <- mcols(gtf)$gene_id[subjectHits(olaps[which(p == queryHits(olaps))])]
+            if (p %in% S4Vectors::queryHits(olaps)) {
+              geneid <- S4Vectors::mcols(gtf)$gene_id[S4Vectors::subjectHits(olaps[which(p == S4Vectors::queryHits(olaps))])]
               geneid <- unique(geneid)
               geneidlist[[length(geneidlist)+1]] <- paste(geneid, collapse = ", ")
-              genename <- mcols(gtf)$gene_name[subjectHits(olaps[which(p == queryHits(olaps))])]
+              genename <- S4Vectors::mcols(gtf)$gene_name[S4Vectors::subjectHits(olaps[which(p == S4Vectors::queryHits(olaps))])]
               genename <- unique(genename)
               genenamelist[[length(genenamelist)+1]] <- paste(genename, collapse = ", ")
-              sequencetype <- mcols(gtf)$type[subjectHits(olaps[which(p == queryHits(olaps))])]
+              sequencetype <- S4Vectors::mcols(gtf)$type[S4Vectors::subjectHits(olaps[which(p == S4Vectors::queryHits(olaps))])]
               sequencetype <- unique(sequencetype)
               sequencetypelist[[length(sequencetypelist)+1]] <- paste(sequencetype, collapse = ", ")
-              exonnumber <- mcols(gtf)$exon_number[subjectHits(olaps[which(p == queryHits(olaps))])]
+              exonnumber <- S4Vectors::mcols(gtf)$exon_number[S4Vectors::subjectHits(olaps[which(p == S4Vectors::queryHits(olaps))])]
               exonnumber <- unique(exonnumber)
               exonnumber <- exonnumber[-which(is.na(exonnumber))]
               exonnumberlist[[length(exonnumberlist)+1]] <- paste(exonnumber, collapse = ", ")
@@ -401,20 +404,22 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
               exonnumberlist[[length(exonnumberlist)+1]] <- "NA"
             }
           }
-          mcols(off_ranges)$gene_id <- geneidlist
+          S4Vectors::mcols(off_ranges)$gene_id <- geneidlist
           more_off_info <- data.frame(geneidlist, genenamelist, sequencetypelist, exonnumberlist)
           more_off_info
         }
         ## Ensures that all off-targets provided run in the same direction as the sgRNA sequence
-        revcomp_index <- which(off_direction == "-")
-        to_be_revcomped <- c(off_offseq[revcomp_index])
-        new_offs <- c()
-        x <- 1
-        for (x in 1:length(to_be_revcomped)) {
-          new_offs[[length(new_offs)+1]] <- as.character(reverseComplement(DNAString(to_be_revcomped[x])))
-        }
-        for (x in 1:length(revcomp_index)) {
-          off_offseq[revcomp_index[x]] <- new_offs[x]
+        if (("-" %in% off_direction) == TRUE) {
+          revcomp_index <- which(off_direction == "-")
+          to_be_revcomped <- c(off_offseq[revcomp_index])
+          new_offs <- c()
+          x <- 1
+          for (x in 1:length(to_be_revcomped)) {
+            new_offs[[length(new_offs)+1]] <- as.character(Biostrings::reverseComplement(Biostrings::DNAString(to_be_revcomped[x])))
+          }
+          for (x in 1:length(revcomp_index)) {
+            off_offseq[revcomp_index[x]] <- new_offs[x]
+          }
         }
         ## Compiles data frame of all off-target annotations
         more_off_info <- annotate_genome(off_chr, off_start, off_end, off_direction, gtfname)

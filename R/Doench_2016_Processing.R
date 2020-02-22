@@ -6,7 +6,7 @@ Doench_2016_processing <- function(seqlist) {
   ## Get single nucleotide position features
   ## Splits each sgRNA into individual nucleotides and adds them to a data frame
   for (x in 1:length(seqlist)) {
-    split_sgRNA_df <- as.data.frame(str_split(seqlist, "", simplify = TRUE))
+    split_sgRNA_df <- as.data.frame(stringr::str_split(seqlist, "", simplify = TRUE))
   }
   nuc_list <- c("A", "C", "G", "T")
   for (x in 1:length(nuc_list)){
@@ -86,10 +86,10 @@ Doench_2016_processing <- function(seqlist) {
   G_count <- c()
   T_count <- c()
   for (x in 1:length(seqlist)) {
-    A_count[[length(A_count)+1]] <- str_count(seqlist[x], "A")
-    C_count[[length(C_count)+1]] <- str_count(seqlist[x], "C")
-    G_count[[length(G_count)+1]] <- str_count(seqlist[x], "G")
-    T_count[[length(T_count)+1]] <- str_count(seqlist[x], "T")
+    A_count[[length(A_count)+1]] <- stringr::str_count(seqlist[x], "A")
+    C_count[[length(C_count)+1]] <- stringr::str_count(seqlist[x], "C")
+    G_count[[length(G_count)+1]] <- stringr::str_count(seqlist[x], "G")
+    T_count[[length(T_count)+1]] <- stringr::str_count(seqlist[x], "T")
   }
   single_nuc_count_frame <- data.frame(A_count, C_count, G_count, T_count)
   ## End of position independent single nucleotide features
@@ -143,7 +143,7 @@ Doench_2016_processing <- function(seqlist) {
   GC_content_lss_10 <- c()
   for (x in 1:length(seqlist)) {
     sgRNA_20mer <- substr(seqlist[x], 5, 24)
-    GC_content[[length(GC_content)+1]] <- (str_count(sgRNA_20mer, "G") + str_count(sgRNA_20mer, "C"))
+    GC_content[[length(GC_content)+1]] <- (stringr::str_count(sgRNA_20mer, "G") + stringr::str_count(sgRNA_20mer, "C"))
     if (GC_content[x] > 10) {
       GC_content_grt_10[[length(GC_content_grt_10)+1]] <- 1
     } else {
@@ -209,9 +209,9 @@ Doench_2016_processing <- function(seqlist) {
     di_nuc_list <- c("AA", "AC", "AG", "AT", "CA", "CC", "CG", "CT", "GA", "GC", "GG", "GT", "TA", "TC", "TG", "TT")
     NN_delta_h <- c(6.82, 10.2, 7.6, 9.38, 10.44, 12.22, 10.64, 10.48, 12.44, 14.88, 13.39, 11.4, 7.69, 13.3, 10.5, 6.6)
     NN_delta_s <- c(19, 26.2, 19.2, 26.7, 26.9, 29.7, 26.7, 27.1, 32.5, 36.9, 32.7, 29.5, 20.5, 35.5, 27.8, 18.4)
-    Bioseq <- DNAString(seq)
+    Bioseq <- Biostrings::DNAString(seq)
     for (x in 1:length(di_nuc_list)){
-      NN_count <- countPattern(di_nuc_list[x], Bioseq)
+      NN_count <- Biostrings::countPattern(di_nuc_list[x], Bioseq)
       if (NN_count != 0) {
         delta_h[[length(delta_h)+1]] <- NN_count * NN_delta_h[x]
         delta_s[[length(delta_s)+1]] <- NN_count * NN_delta_s[x]
