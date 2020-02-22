@@ -1,7 +1,9 @@
 #' @export
 
 ## For this script to work properly, this script must be run from Shiny
-sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
+sgRNA_design_functionR <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
+  requireNamespace("gbm")
+  requireNamespace("Biostrings")
   designprogress$inc(1/10, message = "Finding sgRNA")
   ## Detects whether the user input is a .fasta
   if (isTRUE(stringr::str_detect(userseq, ".fasta"))){
@@ -62,7 +64,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       sgRNA_r_end[[length(sgRNA_r_end)+1]] <- nchar(rev_seq)-x-3
     }
   }
-  ## Removes any sgRNA that contain degerate bases (what about gap characters?)
+  ## Removes any sgRNA that contain degenerate bases
   sgRNA_list_f <- sgRNA_list_f[grepl("[UWSMKRYBDHVNZ]", sgRNA_list_f) == FALSE]
   sgRNA_f_start <- sgRNA_f_start[grepl("[UWSMKRYBDHVNZ]", sgRNA_list_f) == FALSE]
   sgRNA_f_end <- sgRNA_f_end[grepl("[UWSMKRYBDHVNZ]", sgRNA_list_f) == FALSE]
@@ -97,6 +99,13 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       ((stringr::str_count(seqlist, "G") + stringr::str_count(seqlist, "C")) / 20)
     }
     GCinstance <- sapply(sgRNA_seq, FindGC)
+    GCindex <- which(GCinstance >=.8 | GCinstance <=.3)
+    GCinstance_color <- as.character(GCinstance)
+    for (G in 1:length(GCinstance)){
+      if (G %in% GCindex){
+        GCinstance_color[G] <- paste('</span>', GCinstance_color[G], '<span style="color:red">', sep = "")
+      }
+    }
     ## Find homopolmers
     Findhomopolymer <- function(seqlist){
       stringr::str_detect(seqlist, "TTTT|AAAA|GGGG|CCCC")
@@ -136,7 +145,6 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
     ## Assign a study-based efficiency score based on the Doench 2016 paper and data
     ## Efficiency Score
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
-    requireNamespace("gbm")
     Efficiency_Score <- stats::predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
     ## Round that efficiency score to three decimal places
     Efficiency_Score <- round(Efficiency_Score, 3)
@@ -149,7 +157,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       mm3_list <- rep("NA", each = length(sgRNA_list))
       mm4_list <- rep("NA", each = length(sgRNA_list))
       ## Creates data table with all available sgRNA data
-      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance_color, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
       ## Set the names of each column
       colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
       sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
@@ -380,7 +388,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
         all_offtarget_info <- data.frame("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA")
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Score", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance_color, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
         ## Set the names of each column
         colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
@@ -469,7 +477,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
         all_offtarget_info <- data.frame(off_sgRNAseq, off_chr, off_start, off_end, off_mismatch, off_direction, CFD_Scores, off_offseq, more_off_info$geneidlist, more_off_info$genenamelist, more_off_info$sequencetypelist, more_off_info$exonnumberlist)
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance_color, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
         ## Set the names of each column
         colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
