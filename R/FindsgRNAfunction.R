@@ -103,7 +103,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
     GCinstance_color <- as.character(GCinstance)
     for (G in 1:length(GCinstance)){
       if (G %in% GCindex){
-        GCinstance_color[G] <- paste('</span>', GCinstance_color[G], '<span style="color:red">', sep = "")
+        GCinstance_color[G] <- paste('<span style="color:red">', GCinstance_color[G], '<span>', sep = "")
       }
     }
     ## Find homopolmers
