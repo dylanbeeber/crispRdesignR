@@ -1,16 +1,14 @@
 \name{sgRNA_design}
 \alias{sgRNA_design}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{sgRNA Target Design}
 \description{
 sgRNA_design returns information to design sgRNA sequences based on a given target sequence, a genome to annotate off-target information, and a genome annoation file (.gtf), to annotate the off-target findings.
 }
 \usage{
-sgRNA_design(userseq, genomename, gtfname, calloffs = TRUE, annotateoffs = TRUE)
+sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{usersequence}{
+  \item{userseq}{
     The target sequence to generate sgRNA guides for. Can either be a character sequence containing DNA bases or the name of a fasta file in the working directory.
 }
   \item{genomename}{
@@ -28,36 +26,23 @@ sgRNA_design(userseq, genomename, gtfname, calloffs = TRUE, annotateoffs = TRUE)
 \details{
 Important Note: When designing sgRNA for large genomes (billions of base pairs), use short query DNA sequences (under 500 bp). Depending on your hardware checking for off-targets can be quite computationally intensive and may take several hours if not limited to smaller query sequences.
 }
-\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
-}
 \author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+Dylan Beeber
 }
 \examples{
-alldata <- sgRNA_design("GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz")
+## Designing guide RNA for a target region as a test string, using
+## the Saccharomyces Cerevisiae genome and genome annotation file:
 
-alldata <- sgRNA_design("DAK1.fasta", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz")
+testseq <- "GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG"
+usergenome <- BSgenome.Scerevisiae.UCSC.sacCer2::BSgenome.Scerevisiae.UCSC.sacCer2
+gtfname <- "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz"
+annotation_file <- system.file("example_data", gtfname, package = "crispRdesignR")
+alldata <- sgRNA_design(testseq, usergenome, annotation_file)
 
-alldata <- sgRNA_design("DAK1.fasta", BSgenome.Scerevisiae.UCSC.sacCer2, "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz", calloffs = TRUE, annotateoffs = FALSE)
+## Designing guide RNA for a target region as a text file, using
+## the Saccharomyces Cerevisiae genome and genome annotation file,
+## while switching genome annotation off:
+
+#testseq <- system.file("example_data", "ExampleDAK1seq.txt", package = "crispRdesignR")
+#alldata2 <- sgRNA_design(testseq, usergenome, annotation_file, annotateoffs = FALSE)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
