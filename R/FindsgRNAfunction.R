@@ -99,6 +99,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       ((stringr::str_count(seqlist, "G") + stringr::str_count(seqlist, "C")) / 20)
     }
     GCinstance <- sapply(sgRNA_seq, FindGC)
+    ## Adds color to indicate unfavorable GC content
     GCindex <- which(GCinstance >=.8 | GCinstance <=.3)
     GCinstance_color <- as.character(GCinstance)
     for (G in 1:length(GCinstance)){
@@ -111,7 +112,14 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       stringr::str_detect(seqlist, "TTTT|AAAA|GGGG|CCCC")
     }
     Homopolymerdetect <- sapply(sgRNA_seq, Findhomopolymer)
-    Homopolymerdetect
+    ## Adds color to indicate unfavorable homopolymers
+    Homopolymerdetect_color <- as.character(Homopolymerdetect)
+    for (H in 1:length(Homopolymerdetect)){
+      if (Homopolymerdetect[H] == "TRUE"){
+        Homopolymerdetect_color[H] <- paste('<span style="color:red">', Homopolymerdetect[H], '<span>', sep = "")
+      }
+    }
+    Homopolymerdetect_color
     designprogress$inc(1/10)
     ## Detect Self complementarity
     self_comp_list <- c()
