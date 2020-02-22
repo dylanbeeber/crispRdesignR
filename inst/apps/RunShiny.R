@@ -1,42 +1,4 @@
-#### Note: Genomes must be installed and activated (ex. library("BSgenome.Hsapiens.UCSC.hg19")) before they can be used.
-
-## if packages need to be installed
-## install.packages("shiny")
-## install.packages("stringr", repos='http://cran.us.r-project.org')
-## install.packages("stringi")
-## source("https://bioconductor.org/biocLite.R")
-## biocLite("Biostrings")
-## biocLite("BSgenome")
-## biocLite("AnnotationHub")
-## biocLite("BSgenome.Hsapiens.UCSC.hg19")
-## biocLite("BSgenome.Hsapiens.UCSC.hg38")
-## biocLite("BSgenome.Scerevisiae.UCSC.sacCer2")
-## biocLite("BSgenome.Mmusculus.UCSC.mm10")
-## biocLite("BSgenome.Dmelanogaster.UCSC.dm6")
-## biocLite("BSgenome.Ptroglodytes.UCSC.panTro5")
-## biocLite("BSgenome.Ecoli.NCBI.20080805")
-## biocLite("BSgenome.Celegans.UCSC.ce11")
-## biocLite("BSgenome.Rnorvegicus.UCSC.rn6")
-## biocLite("BSgenome.Athaliana.TAIR.04232008")
-## library(shiny)
-## library(stringr)
-## library(vtreat)
-## library(gbm)
-## library(IRanges)
-## library(GenomicRanges)
-## library(rtracklayer)
-## library(Biostrings)
-## library(DT)
-## library(BSgenome.Hsapiens.UCSC.hg19)
-## library(BSgenome.Hsapiens.UCSC.hg38)
-## library(BSgenome.Scerevisiae.UCSC.sacCer2)
-## library(BSgenome.Mmusculus.UCSC.mm10)
-## library(BSgenome.Dmelanogaster.UCSC.dm6)
-## library(BSgenome.Ptroglodytes.UCSC.panTro5)
-## library(BSgenome.Ecoli.NCBI.20080805)
-## library(BSgenome.Celegans.UCSC.ce11)
-## library(BSgenome.Rnorvegicus.UCSC.rn6)
-## library(BSgenome.Athaliana.TAIR.04232008)
+## Code for the User Interface through Shiny
 
 ui <- fluidPage(
   navbarPage("crispRdesignR",
@@ -84,21 +46,21 @@ ui <- fluidPage(
 server <- function(input, output) {
   ## Increases the maximum file size that can be uploaded to Shiny to accomadate .gtf files
   options(shiny.maxRequestSize=150*1024^2)
-  
+
   ## Creates a list of reactive values that allows the program to
   ## update only when the action button is pressed
   maindf <- reactiveValues(data = NULL)
   offtargetdf <- reactiveValues(data = NULL)
-  
+
   ## Creates default values for the arguments in the find sgRNA function
   callofftargets <- "yes_off"
   annotateofftargets <- "yes_annotate"
   givenPAM <- "NGG"
-  
+
   ## Creates a variable for the gene annotation file
   gtf_datapath <<- 0
   gene_annotation_file <<- 0
-  
+
   ## Runs the sgRNA_design function when the action button is pressed
   observeEvent(input$run, {
     callofftargets <- input$'toggle_off_targets'
@@ -121,7 +83,7 @@ server <- function(input, output) {
     }
     if (input$'fasta' == TRUE) {
       if (isTRUE(grep("*.fasta", input$'fastafile'$datapath) == 1)) {
-        sequence <- import(input$'fastafile'$datapath, format = "fasta")
+        sequence <- rtracklayer::import(input$'fastafile'$datapath, format = "fasta")
         sequence <- as.character(sequence)
       } else if (isTRUE(grep("*.txt", input$'fastafile'$datapath) == 1)) {
         sequence <- read.table(input$'fastafile'$datapath)
@@ -134,10 +96,10 @@ server <- function(input, output) {
       }
     } else {
       sequence <- paste(input$'sequence', collapse = "")
-      sequence <- str_replace_all(sequence, fixed(" "), "")
+      sequence <- stringr::str_replace_all(sequence, stringr::fixed(" "), "")
     }
     # Check to see if input is valid
-    if (isTRUE(try(class(DNAString(sequence)) == "DNAString"))) {
+    if (isTRUE(try(class(Biostrings::DNAString(sequence)) == "DNAString"))) {
       # Create a Progress object
       designprogress <- shiny::Progress$new()
       designprogress$set(message = "Preparing gene annotation file", value = 0, detail = "This may take a while")
@@ -159,12 +121,12 @@ server <- function(input, output) {
       } else {
         if ((annotating != FALSE) & (gtf_datapath == 0)) {
           gtf_datapath <<- input$'gtf_file'$datapath
-          gene_annotation_file <<- import.gff(input$'gtf_file'$datapath)
+          gene_annotation_file <<- rtracklayer::import.gff(input$'gtf_file'$datapath)
         }
         if (annotating != FALSE) {
           if (gtf_datapath != input$'gtf_file'$datapath) {
             gtf_datapath <<- input$'gtf_file'$datapath
-            gene_annotation_file <<- import.gff(input$'gtf_file'$datapath)
+            gene_annotation_file <<- rtracklater::import.gff(input$'gtf_file'$datapath)
           }
         }
         ## Inititates sgRNA_design_function
@@ -214,25 +176,25 @@ server <- function(input, output) {
       ))
     }
   })
-  
+
   output$Download_sgRNA <- downloadHandler(
     filename = function(){"sgRNA.csv"},
     content = function(file) {
       write.csv(maindf$sgRNA_data, file, row.names = TRUE)
     }
   )
-  
+
   output$Download_off <- downloadHandler(
     filename = function(){"Offtarget.csv"},
     content = function(file) {
       write.csv(offtargetdf$data, file, row.names = TRUE)
     }
   )
-  
+
   ## Reactively outputs an sgRNA table when the function is complete
   output$sgRNA_data <- DT::renderDataTable({maindf$sgRNA_data}, escape = FALSE)
   output$offtarget_data <- DT::renderDataTable({offtargetdf$data}, escape = FALSE)
-  
+
   ## Add fasta file input to the UI
   observeEvent(input$fasta, {
     if (input$fasta == TRUE) {
@@ -251,7 +213,7 @@ server <- function(input, output) {
       )
     }
   })
-  
+
   ## Add Additional Options input to the UI
   observeEvent(input$options_toggle, {
     if (input$options_toggle == TRUE) {
@@ -278,7 +240,7 @@ server <- function(input, output) {
       )
     }
   })
-  
+
 }
 
 shinyApp(ui=ui, server=server)
