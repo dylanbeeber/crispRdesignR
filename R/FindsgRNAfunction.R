@@ -178,7 +178,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       if (is.null(Individ_Notes)) {
         Individ_Notes[[length(Individ_Notes)+1]] <- "N/A"
       }
-      Notes[[length(Notes)+1]] <- paste(Individ_Notes, sep = ", ")
+      Notes[[length(Notes)+1]] <- paste(Individ_Notes, sep = ", ", collapse = ", ")
     }
     ## Ends the function and outputs data if off-target searching is skipped
     if (calloffs == "no_off") {
