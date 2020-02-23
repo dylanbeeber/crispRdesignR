@@ -172,7 +172,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       if (self_comp_list[R] > 0) {
         Individ_Notes[[length(Individ_Notes)+1]] <- "Self Complementary"
       }
-      if (Efficiency_Score < 0.5) {
+      if (Efficiency_Score[R] < 0.5) {
         Individ_Notes[[length(Individ_Notes)+1]] <- "Low Efficiency"
       }
       if (is.null(Individ_Notes)) {
