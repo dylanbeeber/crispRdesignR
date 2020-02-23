@@ -130,12 +130,13 @@ server <- function(input, output) {
           }
         }
         ## Inititates sgRNA_design_function
+
         all_data <- sgRNA_design_function(userseq = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
                                            calloffs = callofftargets, annotateoffs = annotateofftargets)
         if ((length(all_data) == 0) == FALSE) {
-          int_sgRNA_data <- data.frame(all_data[1:14])
+          int_sgRNA_data <- data.frame(all_data[1:15])
           colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
-                                        "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+                                        "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
           if (input$run == 1) {
             insertUI(
               selector = "#placeholder3",
@@ -147,7 +148,7 @@ server <- function(input, output) {
             )
           }
           maindf$sgRNA_data <- int_sgRNA_data
-          int_offtarget_data <- data.frame(all_data[15:26])
+          int_offtarget_data <- data.frame(all_data[16:27])
           colnames(int_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
                                             "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
           if (input$run == 1) {
