@@ -50,7 +50,9 @@ server <- function(input, output) {
   ## Creates a list of reactive values that allows the program to
   ## update only when the action button is pressed
   maindf <- reactiveValues(data = NULL)
+  downloadmaindf <- reactiveValues(data = NULL)
   offtargetdf <- reactiveValues(data = NULL)
+  downloadofftargetdf <- reactiveValues(data = NULL)
 
   ## Creates default values for the arguments in the find sgRNA function
   callofftargets <- "yes_off"
@@ -75,6 +77,7 @@ server <- function(input, output) {
         ))
       }
     }
+    ## Sets default parameteres for the sgRNA_design function
     if (is.null(callofftargets)){
       callofftargets <- "yes_off"
     }
@@ -130,13 +133,33 @@ server <- function(input, output) {
           }
         }
         ## Inititates sgRNA_design_function
-
         all_data <- sgRNA_design_function(userseq = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
                                            calloffs = callofftargets, annotateoffs = annotateofftargets)
         if ((length(all_data) == 0) == FALSE) {
+          ## Starts creating the sgRNA table
           int_sgRNA_data <- data.frame(all_data[1:15])
+          ## Adds color to indicate unfavorable GC content
+          GCinstance <- unlist(int_sgRNA_data[6])
+          GCindex <- which(GCinstance >=.8 | GCinstance <=.3)
+          GCinstance_color <- as.character(GCinstance)
+          for (G in 1:length(GCinstance)){
+            if (G %in% GCindex){
+              GCinstance_color[G] <- paste('<span style="color:red">', GCinstance_color[G], '<span>', sep = "")
+            }
+          }
+          ## Adds color to indicate unfavorable homopolymers
+          Homopolymerdetect <- unlist(int_sgRNA_data[7])
+          Homopolymerdetect_color <- as.character(Homopolymerdetect)
+          for (H in 1:length(Homopolymerdetect)){
+            if (Homopolymerdetect[H] == "TRUE"){
+              Homopolymerdetect_color[H] <- paste('<span style="color:red">', Homopolymerdetect[H], '<span>', sep = "")
+            }
+          }
+          proc_sgRNA_data <- data.frame(int_sgRNA_data[1:5], GCinstance_color, Homopolymerdetect_color, int_sgRNA_data[8:15])
           colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
                                         "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
+          colnames(proc_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
+                                         "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
           if (input$run == 1) {
             insertUI(
               selector = "#placeholder3",
@@ -147,9 +170,33 @@ server <- function(input, output) {
               )
             )
           }
-          maindf$sgRNA_data <- int_sgRNA_data
+          ## Outputs the Table
+          maindf$sgRNA_data <- proc_sgRNA_data
+          downloadmaindf$sgRNA_data <- int_sgRNA_data
+          ## Starts creating the off-target annotation table
           int_offtarget_data <- data.frame(all_data[16:27])
+          ## Adds code to color mismatches red within the off target sequences
+          off_offseq <- as.character(unlist(int_offtarget_data[8]))
+          off_sgRNAseq <- as.character(unlist(int_offtarget_data[1]))
+          for (x in 1:length(off_offseq)) {
+            justsgRNA <- off_sgRNAseq[x]
+            justoff <- off_offseq[x]
+            splitjustsgRNA <- stringr::str_split(justsgRNA, "", simplify = TRUE)
+            splitoffsgRNA <- stringr::str_split(justoff, "", simplify = TRUE)
+            mismatches <- which(splitjustsgRNA != splitoffsgRNA)
+            splitlistoffsgRNA <- as.list(splitoffsgRNA)
+            if (length(mismatches) != 0){
+              for (g in length(mismatches):1) {
+                splitlistoffsgRNA <- append(splitlistoffsgRNA, '</span>', after = mismatches[g])
+                splitlistoffsgRNA <- append(splitlistoffsgRNA, '<span style="color:red">', after = mismatches[g]-1)
+              }
+              off_offseq[x] <- paste(splitlistoffsgRNA, sep="", collapse = "")
+            }
+          }
+          proc_offtarget_data <- data.frame(int_offtarget_data[1:7], off_offseq, int_offtarget_data[9:12])
           colnames(int_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
+                                            "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
+          colnames(proc_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
                                             "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
           if (input$run == 1) {
             insertUI(
@@ -162,7 +209,8 @@ server <- function(input, output) {
               )
             )
           }
-          offtargetdf$data <- int_offtarget_data
+          offtargetdf$data <- proc_offtarget_data
+          downloadofftargetdf$data <- int_offtarget_data
         } else {
           showModal(modalDialog(
             title = "Error",
@@ -181,14 +229,14 @@ server <- function(input, output) {
   output$Download_sgRNA <- downloadHandler(
     filename = function(){"sgRNA.csv"},
     content = function(file) {
-      write.csv(maindf$sgRNA_data, file, row.names = TRUE)
+      write.csv(downloadmaindf$sgRNA_data, file, row.names = TRUE)
     }
   )
 
   output$Download_off <- downloadHandler(
     filename = function(){"Offtarget.csv"},
     content = function(file) {
-      write.csv(offtargetdf$data, file, row.names = TRUE)
+      write.csv(downloadofftargetdf$data, file, row.names = TRUE)
     }
   )
 
