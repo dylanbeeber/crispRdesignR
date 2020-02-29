@@ -99,27 +99,11 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       ((stringr::str_count(seqlist, "G") + stringr::str_count(seqlist, "C")) / 20)
     }
     GCinstance <- sapply(sgRNA_seq, FindGC)
-    ## Adds color to indicate unfavorable GC content
-    GCindex <- which(GCinstance >=.8 | GCinstance <=.3)
-    GCinstance_color <- as.character(GCinstance)
-    for (G in 1:length(GCinstance)){
-      if (G %in% GCindex){
-        GCinstance_color[G] <- paste('<span style="color:red">', GCinstance_color[G], '<span>', sep = "")
-      }
-    }
     ## Find homopolmers
     Findhomopolymer <- function(seqlist){
       stringr::str_detect(seqlist, "TTTT|AAAA|GGGG|CCCC")
     }
     Homopolymerdetect <- sapply(sgRNA_seq, Findhomopolymer)
-    ## Adds color to indicate unfavorable homopolymers
-    Homopolymerdetect_color <- as.character(Homopolymerdetect)
-    for (H in 1:length(Homopolymerdetect)){
-      if (Homopolymerdetect[H] == "TRUE"){
-        Homopolymerdetect_color[H] <- paste('<span style="color:red">', Homopolymerdetect[H], '<span>', sep = "")
-      }
-    }
-    Homopolymerdetect_color
     designprogress$inc(1/10)
     ## Detect Self complementarity
     self_comp_list <- c()
@@ -189,7 +173,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       mm3_list <- rep("NA", each = length(sgRNA_list))
       mm4_list <- rep("NA", each = length(sgRNA_list))
       ## Creates data table with all available sgRNA data
-      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance_color, Homopolymerdetect_color, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
+      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
       ## Set the names of each column
       colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
       sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
@@ -274,7 +258,6 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
           }
           ## Searches for off-targets in the reverse strand
           rev_pattern <- Biostrings::reverseComplement(usepattern)
-          ####rev_off_info <- Biostrings::matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
           rev_off_info <- Biostrings::matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = TRUE)
           if (length(rev_off_info) > 0) {
             rev_off_info_full <- IRanges::Views(subject, (BiocGenerics::start(rev_off_info)-lengthPAM), BiocGenerics::end(rev_off_info))
@@ -420,7 +403,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
         all_offtarget_info <- data.frame("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA")
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Score", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance_color, Homopolymerdetect_color, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
         ## Set the names of each column
         colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
@@ -486,22 +469,6 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
             off_offseq[revcomp_index[x]] <- new_offs[x]
           }
         }
-        ## Adds code to color mismatches red within the off target sequences
-        for (x in 1:length(off_offseq)) {
-          justsgRNA <- off_sgRNAseq[x]
-          justoff <- off_offseq[x]
-          splitjustsgRNA <- stringr::str_split(justsgRNA, "", simplify = TRUE)
-          splitoffsgRNA <- stringr::str_split(justoff, "", simplify = TRUE)
-          mismatches <- which(splitjustsgRNA != splitoffsgRNA)
-          splitlistoffsgRNA <- as.list(splitoffsgRNA)
-          if (length(mismatches) != 0){
-            for (g in length(mismatches):1) {
-              splitlistoffsgRNA <- append(splitlistoffsgRNA, '</span>', after = mismatches[g])
-              splitlistoffsgRNA <- append(splitlistoffsgRNA, '<span style="color:red">', after = mismatches[g]-1)
-            }
-            off_offseq[x] <- paste(splitlistoffsgRNA, sep="", collapse = "")
-          }
-        }
         ## Compiles data frame of all off-target annotations
         more_off_info <- annotate_genome(off_chr, off_start, off_end, off_direction, gtf)
         designprogress$inc(amount = 1/10, message = "Compiling Data")
@@ -509,7 +476,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
         all_offtarget_info <- data.frame(off_sgRNAseq, off_chr, off_start, off_end, off_mismatch, off_direction, CFD_Scores, off_offseq, more_off_info$geneidlist, more_off_info$genenamelist, more_off_info$sequencetypelist, more_off_info$exonnumberlist)
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance_color, Homopolymerdetect_color, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
         ## Set the names of each column
         colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
