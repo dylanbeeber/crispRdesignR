@@ -1,7 +1,7 @@
 #' @export
 
 ## For this script to work properly, this script must be run from Shiny
-sgRNA_design_functionR <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
+sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
   requireNamespace("gbm", quietly = TRUE)
   designprogress$inc(1/10, message = "Finding sgRNA")
   ## Detects whether the user input is a .fasta
@@ -145,18 +145,18 @@ sgRNA_design_functionR <- function(userseq, genomename, gtf, designprogress, use
     for (R in 1:length(sgRNA_seq)) {
       Individ_Notes <- c()
       if (GCinstance[R] >=.8) {
-        Individ_Notes[[length(Individ_Notes)+1]] <- "High GC"
+        Individ_Notes[[length(Individ_Notes)+1]] <- "GC"
       } else if (GCinstance[R] >=.3) {
-        Individ_Notes[[length(Individ_Notes)+1]] <- "Low GC"
+        Individ_Notes[[length(Individ_Notes)+1]] <- "GC"
       }
       if (Homopolymerdetect[R] == TRUE) {
-        Individ_Notes[[length(Individ_Notes)+1]] <- "Homopolymer"
+        Individ_Notes[[length(Individ_Notes)+1]] <- "HP"
       }
       if (self_comp_list[R] > 0) {
-        Individ_Notes[[length(Individ_Notes)+1]] <- "Self Complementary"
+        Individ_Notes[[length(Individ_Notes)+1]] <- "SC"
       }
       if (Efficiency_Score[R] < 0.5) {
-        Individ_Notes[[length(Individ_Notes)+1]] <- "Low Efficiency"
+        Individ_Notes[[length(Individ_Notes)+1]] <- "LE"
       }
       if (is.null(Individ_Notes)) {
         Individ_Notes[[length(Individ_Notes)+1]] <- "N/A"

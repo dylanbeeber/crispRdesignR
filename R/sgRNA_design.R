@@ -52,8 +52,11 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
   if (setPAM != "NGG") {
     print("Warning: Doench efficiency scores are only accurate for NGG PAMs")
   }
+  revsetPAM <- Biostrings::reverseComplement(Biostrings::DNAString(userPAM))
+  lengthPAM <- nchar(setPAM)
   usesetPAM <- stringr::str_replace_all(setPAM, "N", ".")
-  lengthpostPAM <- (6 - nchar(usesetPAM))
+  revusesetPAM <- stringr::str_replace_all(revsetPAM, "N", ".")
+  lengthpostPAM <- (6 - lengthPAM)
   PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
   ## Searches all 23 nt streches in the sequence for
   ## possible matches to the PAM, then puts entire 30 nt
@@ -151,6 +154,30 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     ## Round that efficiency score to three decimal places
     Efficiency_Score <- round(Efficiency_Score, 3)
     ## Study-based efficiency score done
+    ## Creates a list that notates any warnings respective to each sgRNA
+    Notes <- c()
+    for (R in 1:length(sgRNA_seq)) {
+      Individ_Notes <- c()
+      if (GCinstance[R] >=.8) {
+        Individ_Notes[[length(Individ_Notes)+1]] <- "High GC"
+      } else if (GCinstance[R] >=.3) {
+        Individ_Notes[[length(Individ_Notes)+1]] <- "Low GC"
+      }
+      if (Homopolymerdetect[R] == TRUE) {
+        Individ_Notes[[length(Individ_Notes)+1]] <- "Homopolymer"
+      }
+      if (self_comp_list[R] > 0) {
+        Individ_Notes[[length(Individ_Notes)+1]] <- "Self Complementary"
+      }
+      if (Efficiency_Score[R] < 0.5) {
+        Individ_Notes[[length(Individ_Notes)+1]] <- "Low Efficiency"
+      }
+      if (is.null(Individ_Notes)) {
+        Individ_Notes[[length(Individ_Notes)+1]] <- "N/A"
+      }
+      Notes[[length(Notes)+1]] <- paste(Individ_Notes, sep = ", ", collapse = ", ")
+    }
+    ## Ends the function and outputs data if off-target searching is skipped
     if (calloffs == FALSE) {
       mm0_list <- rep("NA", each = length(sgRNA_list))
       mm1_list <- rep("NA", each = length(sgRNA_list))
@@ -158,9 +185,9 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       mm3_list <- rep("NA", each = length(sgRNA_list))
       mm4_list <- rep("NA", each = length(sgRNA_list))
       ## Creates data table with all available sgRNA data
-      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+      sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
       ## Set the names of each column
-      colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+      colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
       sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
       ## Creates an empty data table for off-target annotation
       all_offtarget_info <- data.frame("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA")
@@ -195,6 +222,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       PAM_test_list <- c("GG", "AG", "CG", "GA", "GC", "GT", "TG")
       rev_PAM_test_list <- c("CC", "CT", "CG", "TC", "GC", "AC", "CA")
       for (seqname in seqnames) {
+        subject <- usegenome[[seqname]]
         print(paste("Checking for Off-Targets in", seqname, sep = " "))
         chrmm0_list <- c()
         chrmm1_list <- c()
@@ -207,65 +235,85 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
         revchrmm3_list <- c()
         revchrmm4_list <- c()
         for (pattern in Biostrings_sgRNA) {
-          usepattern <- Biostrings::DNAString(paste(substr(as.character(pattern), 1, 20), setPAM, sep ="", collapse =""))
-          subject <- usegenome[[seqname]]
+          usepattern <- Biostrings::DNAString(substr(as.character(pattern), 1, 20))
           ## Searches for off-targets in the forward strand
-          off_info <- Biostrings::matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
-          ## Excludes off-targets that contain invalid "NGG" PAMs
-          if (setPAM == "NGG") {
-            off_info_position <- c()
-            if (length(off_info) > 0) {
-              for (f in 1:length(off_info)) {
-                if (substr(as.character(off_info[[f]]), 22, 23) %in% PAM_test_list) {
-                  off_info_position[[length(off_info_position)+1]] <- f
-                }
-              }
+          off_info <- Biostrings::matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = TRUE)
+          if (length(off_info) > 0) {
+            off_info_full <- IRanges::Views(subject, BiocGenerics::start(off_info), BiocGenerics::end(off_info)+lengthPAM)
+            if (setPAM == "NGG") {
+              off_info_position <- which(substr(as.character(off_info_full), 22, 23) %in% PAM_test_list)
+              off_info <- off_info[off_info_position]
+              off_info_full <- off_info_full[off_info_position]
+            } else {
+              off_info_position <- which(stringr::str_detect(substr(as.character(off_info_full), 21, 20+lengthPAM), usesetPAM))
+              off_info <- off_info[off_info_position]
+              off_info_full <- off_info_full[off_info_position]
             }
-            off_info <- off_info[off_info_position]
           }
-          mis_info <- Biostrings::mismatch(usepattern, off_info, fixed = FALSE)
+          mis_info <- IRanges::elementNROWS(Biostrings::mismatch(usepattern, off_info))
+          if (length(off_info) > 0) {
+            seqs_w_4mm <- which(mis_info == 4)
+            seqs_w_off_PAM <- which(substr(as.character(off_info_full), 22, 23) %in% c("AG", "CG", "GA", "GC", "GT", "TG"))
+            discard_offs <- intersect(seqs_w_4mm, seqs_w_off_PAM)
+            if (length(discard_offs) != 0) {
+              off_info <- off_info[-discard_offs]
+              off_info_full <- off_info_full[-discard_offs]
+              mis_info <- mis_info[-discard_offs]
+            }
+          }
           ## Searches for off-targets in the reverse strand
           rev_pattern <- Biostrings::reverseComplement(usepattern)
-          rev_off_info <- Biostrings::matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
-          ## Excludes off-targets that contain invalid "NGG" PAMs
-          if (setPAM == "NGG") {
-            rev_off_info_position <- c()
-            if (length(rev_off_info) > 0) {
-              for (f in 1:length(rev_off_info)) {
-                if (substr(as.character(rev_off_info[[f]]), 1, 2) %in% rev_PAM_test_list) {
-                  rev_off_info_position[[length(rev_off_info_position)+1]] <- f
-                }
-              }
+          ### rev_off_info <- Biostrings::matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
+          rev_off_info <- Biostrings::matchPattern(rev_pattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = TRUE)
+          if (length(rev_off_info) > 0) {
+            rev_off_info_full <- IRanges::Views(subject, (BiocGenerics::start(rev_off_info)-lengthPAM), BiocGenerics::end(rev_off_info))
+            if (setPAM == "NGG") {
+              rev_off_info_position <- which(substr(as.character(rev_off_info_full), 1, 2) %in% rev_PAM_test_list)
+              rev_off_info <- rev_off_info[rev_off_info_position]
+              rev_off_info_full <- rev_off_info_full[rev_off_info_position]
+            } else {
+              rev_off_info_position <- which(stringr::str_detect(substr(as.character(rev_off_info_full), 1, lengthPAM), revusesetPAM))
+              rev_off_info <- rev_off_info[rev_off_info_position]
+              rev_off_info_full <- rev_off_info_full[rev_off_info_position]
             }
-            rev_off_info <- rev_off_info[rev_off_info_position]
           }
-          rev_mis_info <- Biostrings::mismatch(rev_pattern, rev_off_info, fixed = FALSE)
+          rev_mis_info <- IRanges::elementNROWS(Biostrings::mismatch(rev_pattern, rev_off_info))
+          if (length(rev_mis_info) > 0) {
+            rev_seqs_w_4mm <- which(rev_mis_info == 4)
+            rev_seqs_w_off_PAM <- which(substr(as.character(rev_off_info_full), 1, 2) %in% c("CT", "CG", "TC", "GC", "AC", "CA"))
+            rev_discard_offs <- intersect(rev_seqs_w_4mm, rev_seqs_w_off_PAM)
+            if (length(rev_discard_offs) != 0) {
+              rev_off_info <- rev_off_info[-rev_discard_offs]
+              rev_off_info_full <- rev_off_info_full[-rev_discard_offs]
+              rev_mis_info <- rev_mis_info[-rev_discard_offs]
+            }
+          }
           if (length(off_info) > 0) {
             for (f in 1:length(off_info)) {
               off_start[[length(off_start)+1]] <- BiocGenerics::start(off_info)[f]
-              off_end[[length(off_end)+1]] <- BiocGenerics::end(off_info)[f]
+              off_end[[length(off_end)+1]] <- BiocGenerics::end(off_info)[f]+lengthPAM
               off_direction[[length(off_direction)+1]] <- "+"
               off_chr[[length(off_chr)+1]] <- seqname
-              off_mismatch[[length(off_mismatch)+1]] <- length(mis_info[[f]])
+              off_mismatch[[length(off_mismatch)+1]] <- mis_info[f]
               off_sgRNAseq[[length(off_sgRNAseq)+1]] <- as.character(pattern)
-              off_offseq[[length(off_offseq)+1]] <- as.character(off_info[[f]])
+              off_offseq[[length(off_offseq)+1]] <- as.character(off_info_full[f])
             }
           }
           if (length(rev_off_info) > 0) {
             for (f in 1:length(rev_off_info)) {
-              off_start[[length(off_start)+1]] <- BiocGenerics::start(rev_off_info)[f]
+              off_start[[length(off_start)+1]] <- BiocGenerics::start(rev_off_info)[f]-lengthPAM
               off_end[[length(off_end)+1]] <- BiocGenerics::end(rev_off_info)[f]
               off_direction[[length(off_direction)+1]] <- "-"
               off_chr[[length(off_chr)+1]] <- seqname
-              off_mismatch[[length(off_mismatch)+1]] <- length(rev_mis_info[[f]])
+              off_mismatch[[length(off_mismatch)+1]] <- rev_mis_info[f]
               off_sgRNAseq[[length(off_sgRNAseq)+1]] <- as.character(pattern)
-              off_offseq[[length(off_offseq)+1]] <- as.character(rev_off_info[[f]])
+              off_offseq[[length(off_offseq)+1]] <- as.character(rev_off_info_full[f])
             }
           }
           individMM <- c()
           if (length(mis_info) > 0) {
             for (f in 1:length(mis_info)) {
-              individMM[[length(individMM)+1]] <- length(mis_info[[f]])
+              individMM[[length(individMM)+1]] <- mis_info[f]
             }
             chrmm0_list[[length(chrmm0_list)+1]] <- sum(individMM == 0)
             chrmm1_list[[length(chrmm1_list)+1]] <- sum(individMM == 1)
@@ -282,7 +330,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
           individMM <- c()
           if (length(rev_mis_info) > 0) {
             for (f in 1:length(rev_mis_info)) {
-              individMM[[length(individMM)+1]] <- length(rev_mis_info[[f]])
+              individMM[[length(individMM)+1]] <- rev_mis_info[f]
             }
             revchrmm0_list[[length(revchrmm0_list)+1]] <- sum(individMM == 0)
             revchrmm1_list[[length(revchrmm1_list)+1]] <- sum(individMM == 1)
@@ -357,9 +405,9 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       ## Decides whether to annotate off_targets
       if (((sum(mm0_list) + sum(mm1_list) + sum(mm2_list) + sum(mm3_list)) == 0) || (annotateoffs == FALSE)) {
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
         ## Set the names of each column
-        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
         sgRNA_data
       } else {
@@ -427,9 +475,9 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
         all_offtarget_info <- data.frame(off_sgRNAseq, off_chr, off_start, off_end, off_mismatch, off_direction, CFD_Scores, off_offseq, more_off_info$geneidlist, more_off_info$genenamelist, more_off_info$sequencetypelist, more_off_info$exonnumberlist)
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
         ## Put lists in data frame
-        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list)
+        sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
         ## Set the names of each column
-        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4")
+        colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
         data_list <- c("sgRNA_data" = sgRNA_data, "all_offtarget_info" = all_offtarget_info)
         data_list
