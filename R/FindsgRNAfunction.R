@@ -1,9 +1,8 @@
 #' @export
 
 ## For this script to work properly, this script must be run from Shiny
-sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
-  requireNamespace("gbm")
-  requireNamespace("Biostrings")
+sgRNA_design_functionR <- function(userseq, genomename, gtf, designprogress, userPAM, calloffs, annotateoffs){
+  requireNamespace("gbm", quietly = TRUE)
   designprogress$inc(1/10, message = "Finding sgRNA")
   ## Detects whether the user input is a .fasta
   if (isTRUE(stringr::str_detect(userseq, ".fasta"))){
@@ -229,7 +228,6 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
           ### usepattern <- DNAString(paste(substr(as.character(pattern), 1, 20), setPAM, sep ="", collapse =""))
           usepattern <- Biostrings::DNAString(substr(as.character(pattern), 1, 20))
           ## Searches for off-targets in the forward strand
-          ### off_info <- Biostrings::matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = c(pattern = FALSE, subject = TRUE))
           off_info <- Biostrings::matchPattern(usepattern, subject, max.mismatch = 4, min.mismatch = 0, fixed = TRUE)
           if (length(off_info) > 0) {
             off_info_full <- IRanges::Views(subject, BiocGenerics::start(off_info), BiocGenerics::end(off_info)+lengthPAM)
@@ -243,7 +241,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
               off_info_full <- off_info_full[off_info_position]
             }
           }
-          mis_info <- Biostrings::nmismatch(usepattern, off_info)
+          mis_info <- IRanges::elementNROWS(Biostrings::mismatch(usepattern, off_info))
           if (setPAM == "NGG") {
             if (length(off_info) > 0) {
               seqs_w_4mm <- which(mis_info == 4)
@@ -271,7 +269,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
               rev_off_info_full <- rev_off_info_full[rev_off_info_position]
             }
           }
-          rev_mis_info <- Biostrings::nmismatch(rev_pattern, rev_off_info)
+          rev_mis_info <- IRanges::elementNROWS(Biostrings::mismatch(rev_pattern, rev_off_info))
           if (setPAM == "NGG") {
             if (length(rev_mis_info) > 0) {
               rev_seqs_w_4mm <- which(rev_mis_info == 4)

@@ -4,6 +4,7 @@
 ## a gtf file to annotate the offtargets)
 
 sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoffs = TRUE){
+  requireNamespace("gbm", quietly = TRUE)
   if (missing(userPAM)) {
     userPAM <- "NGG"
   }
@@ -146,7 +147,6 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     } ## Self comp checking ends here
     ## Efficiency Score
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
-    requireNamespace("gbm")
     Efficiency_Score <- stats::predict(Rule_Set_2_Model, processed_efficiency_data, n.trees = 500)
     ## Round that efficiency score to three decimal places
     Efficiency_Score <- round(Efficiency_Score, 3)
