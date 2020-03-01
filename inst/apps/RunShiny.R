@@ -59,6 +59,9 @@ server <- function(input, output) {
   annotateofftargets <- "yes_annotate"
   givenPAM <- "NGG"
 
+  ## Creates a variable that assists with adding UI elements
+  n <- 0
+
   ## Creates a variable for the gene annotation file
   gtf_datapath <<- 0
   gene_annotation_file <<- 0
@@ -133,7 +136,7 @@ server <- function(input, output) {
           }
         }
         ## Inititates sgRNA_design_function
-        all_data <- sgRNA_design_function(userseq = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
+        all_data <- sgRNA_design_functionR(userseq = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
                                            calloffs = callofftargets, annotateoffs = annotateofftargets)
         if ((length(all_data) == 0) == FALSE) {
           ## Starts creating the sgRNA table
@@ -160,7 +163,9 @@ server <- function(input, output) {
                                         "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
           colnames(proc_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
                                          "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
-          if (input$run == 1) {
+          ## Adds a title and download button for the sgRNA table to the UI
+          n <- n+1
+          if (n == 1) {
             insertUI(
               selector = "#placeholder3",
               where = "afterEnd",
@@ -198,7 +203,8 @@ server <- function(input, output) {
                                             "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
           colnames(proc_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
                                             "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
-          if (input$run == 1) {
+          ## Adds a title and download button for the off-target table to the UI
+          if (n == 1) {
             insertUI(
               selector = "#placeholder4",
               where = "afterEnd",
