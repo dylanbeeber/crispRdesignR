@@ -2,5 +2,6 @@
 ^\.Rproj\.user$
 ^cran-comments\.md$
 ^NEWS\.md$
-^.travis.yml$
-^inst\program_data$
+^README\.md$
+^\.travis\.yml$
+^inst/program_data$
