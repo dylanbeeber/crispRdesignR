@@ -2,7 +2,9 @@ Package: crispRdesignR
 Type: Package
 Title: sgRNA Design for CRISPR/Cas9
 Version: 1.0
-Author: Dylan Beeber
+Authors@R: c(
+    person("Dylan", "Beeber", email = "dylan.beeber@gmail.com", role = c("aut", "cre")),
+    person("Frederic", "Chain", role = "aut"))
 Maintainer: <dylan.beeber@gmail.com>
 Description: This package aims to provide all scientifically pertinent information when designing guide RNA sequences for Cas9 genome editing. When provided a target DNA sequence for editing, a genome to check for off-targets in, and a genome annotation file (.gtf) to provide addition information about off-target matches it will out put information for two separate data tables. The first table contains all information on the generated sgRNA themselves (sgRNA sequence, PAM, Direction, Start, End, GC content, Presence of Homopolymers, Effciency Score (Doench 2016), and Genomic Matches). The second table contains all information on the found off-target sequences (Original sgRNA Sequence, Chromosome, Start, End, Number of Mismatches, Direction, CFD Scores, Matched Sequence, Gene ID, Gene Name, Sequence Type, and Exon Number).
 License: GNU General Public License
@@ -22,7 +24,5 @@ Imports:
   shiny,
   DT,
   BSgenome.Scerevisiae.UCSC.sacCer2
-Suggests:
-  BSgenome.Hsapiens.UCSC.hg19
 LazyData: true
 RoxygenNote: 7.0.2
