@@ -25,8 +25,6 @@ Using the GUI version:
 
 - `library(crispRdesignR)`
 
-- `library(Biostrings)`
-
 - `crispRdesignRUI()`
 
 - Click on the “UseFASTA or txt file as target sequence” button and choose the DAK1.fasta or DAK1_short.txt file, or copy and paste the sequence in the box.
