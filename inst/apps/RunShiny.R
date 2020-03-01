@@ -32,7 +32,7 @@ ui <- fluidPage(
                           tags$div(id = "placeholder4"),
                           DT::dataTableOutput("offtarget_data"),
                           titlePanel("About"),
-                          column(12, HTML("The Cas9 Guide Finder designs guide RNA sequences (sgRNA) for Cas9 DNA editing.
+                          column(12, HTML("crispRdesignR designs guide RNA sequences (sgRNA) for Cas9 DNA editing.
                                           To begin, enter a sequence into the sequence box, select a genome to search for
                                           Off-Targets, provide a genome annotation file (.gtf) specific to your genome, and click find sgRNA. <br/><br/> Note about Off-target calling in large genomes: When using a large genome like
                                           Homo sapiens, we reccomend using sequences under 250 base pairs. The time it can take
@@ -60,11 +60,11 @@ server <- function(input, output) {
   givenPAM <- "NGG"
 
   ## Creates a variable that assists with adding UI elements
-  n <- 0
+  n <- reactiveVal(0)
 
   ## Creates a variable for the gene annotation file
-  gtf_datapath <<- 0
-  gene_annotation_file <<- 0
+  gtf_datapath <- reactiveVal(0)
+  gene_annotation_file <- reactiveVal(0)
 
   ## Runs the sgRNA_design function when the action button is pressed
   observeEvent(input$run, {
@@ -117,7 +117,7 @@ server <- function(input, output) {
         annotating <- TRUE
       }
       if (annotating == FALSE) {
-        gene_annotation_file <<- "placeholder"
+        gene_annotation_file("placeholder")
       }
       if ((annotating == TRUE) & (is.null(input$'gtf_file'$datapath) == TRUE)) {
         showModal(modalDialog(
@@ -125,25 +125,25 @@ server <- function(input, output) {
           "Please provide a genome annotation file (.gtf.gz)"
         ))
       } else {
-        if ((annotating != FALSE) & (gtf_datapath == 0)) {
-          gtf_datapath <<- input$'gtf_file'$datapath
-          gene_annotation_file <<- rtracklayer::import.gff(input$'gtf_file'$datapath)
+        if ((annotating != FALSE) & (gtf_datapath() == 0)) {
+          gtf_datapath(input$'gtf_file'$datapath)
+          gene_annotation_file(rtracklayer::import.gff(input$'gtf_file'$datapath))
         }
         if (annotating != FALSE) {
-          if (gtf_datapath != input$'gtf_file'$datapath) {
-            gtf_datapath <<- input$'gtf_file'$datapath
-            gene_annotation_file <<- rtracklater::import.gff(input$'gtf_file'$datapath)
+          if (gtf_datapath() != input$'gtf_file'$datapath) {
+            gtf_datapath(input$'gtf_file'$datapath)
+            gene_annotation_file(rtracklater::import.gff(input$'gtf_file'$datapath))
           }
         }
         ## Inititates sgRNA_design_function
-        all_data <- sgRNA_design_functionR(userseq = sequence, genomename = input$'genome_select', gtf = gene_annotation_file, userPAM = givenPAM, designprogress,
+        all_data <- sgRNA_design_function(userseq = sequence, genomename = input$'genome_select', gtf = gene_annotation_file(), userPAM = givenPAM, designprogress,
                                            calloffs = callofftargets, annotateoffs = annotateofftargets)
         if ((length(all_data) == 0) == FALSE) {
           ## Starts creating the sgRNA table
           int_sgRNA_data <- data.frame(all_data[1:15])
           ## Adds color to indicate unfavorable GC content
-          GCinstance <- unlist(int_sgRNA_data[6])
-          GCindex <- which(GCinstance >=.8 | GCinstance <=.3)
+          GCinstance <- unlist(int_sgRNA_data[6])*100
+          GCindex <- which(GCinstance >=80 | GCinstance <=30)
           GCinstance_color <- as.character(GCinstance)
           for (G in 1:length(GCinstance)){
             if (G %in% GCindex){
@@ -159,18 +159,20 @@ server <- function(input, output) {
             }
           }
           proc_sgRNA_data <- data.frame(int_sgRNA_data[1:5], GCinstance_color, Homopolymerdetect_color, int_sgRNA_data[8:15])
-          colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
-                                        "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
-          colnames(proc_sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content",
-                                         "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
+          colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM", "Strand", "Start", "End", "GC content",
+                                        "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Note Codes")
+          colnames(proc_sgRNA_data) <- c("sgRNA sequence", "PAM", "Strand", "Start", "End", "GC %",
+                                         "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Note Codes")
           ## Adds a title and download button for the sgRNA table to the UI
-          n <- n+1
-          if (n == 1) {
+          n(n()+1)
+          if (n() == 1) {
             insertUI(
               selector = "#placeholder3",
               where = "afterEnd",
               ui = tags$div(id = 'sgRNAdftext',
                             titlePanel("sgRNA Table"),
+                            column(12, "Note Codes: GC - Unfavorable GC content (=< 80% or => 30%), HP - Homopolymer detected (4 or more consectutive base pairs),
+                                   SC - Region of self complementarity detected, LE - Low efficiency score (< 0.5)"),
                             downloadButton("Download_sgRNA", "Download sgRNA")
               )
             )
@@ -199,12 +201,12 @@ server <- function(input, output) {
             }
           }
           proc_offtarget_data <- data.frame(int_offtarget_data[1:7], off_offseq, int_offtarget_data[9:12])
-          colnames(int_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
+          colnames(int_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Strand", "CFD Scores",
                                             "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
-          colnames(proc_offtarget_data) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores",
+          colnames(proc_offtarget_data) <- c("sgRNA sequence", "Chr", "Start", "End", "Mismatches", "Strand", "CFD Scores",
                                             "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
           ## Adds a title and download button for the off-target table to the UI
-          if (n == 1) {
+          if (n() == 1) {
             insertUI(
               selector = "#placeholder4",
               where = "afterEnd",
