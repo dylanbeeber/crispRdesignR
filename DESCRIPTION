@@ -1,7 +1,7 @@
 Package: crispRdesignR
 Type: Package
 Title: sgRNA Design for CRISPR/Cas9
-Version: 1.0
+Version: 1.1.0
 Authors@R: c(
     person("Dylan", "Beeber", email = "dylan.beeber@gmail.com", role = c("aut", "cre")),
     person("Frederic", "Chain", role = "aut"))
