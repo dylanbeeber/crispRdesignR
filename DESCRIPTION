@@ -1,27 +1,23 @@
 Package: crispRdesignR
 Type: Package
 Title: sgRNA Design for CRISPR/Cas9
-Version: 1.1.0
+Version: 1.1.1
+Encoding: UTF-8
 Authors@R: c(
     person("Dylan", "Beeber", email = "dylan.beeber@gmail.com", role = c("aut", "cre")),
     person("Frederic", "Chain", role = "aut"))
-Maintainer: <dylan.beeber@gmail.com>
-Description: This package aims to provide scientifically pertinent information 
-	when designing guide RNA sequences for Cas9 genome editing. When provided 
-	a target DNA sequence for editing, a genome to check for off-targets in, 
-	and a genome annotation file (.gtf), it will output information for two 
-	separate data tables. The first table contains information on the generated 
-	sgRNA (sgRNA sequence, PAM, Direction, Start, End, GC content, Presence of 
-	Homopolymers, Regions of Self Complementarity, Effciency Score (Doench 
-	2016), Number of Potential Off-Target sequences, and Notes on the sgRNA). 
-	The second table contains information on the found off-target sequences 
-	(Original sgRNA Sequence, Chromosome, Start, End, Number of Mismatches, 
-	Direction, CFD Scores, Matched Sequence, Gene ID, Gene Name, Sequence Type, 
-	and Exon Number). This data can be generated through the command line or 
-	through crispRdesignR's GUI. Additionally, a user may provide their own DNA 
-	libraries and genome annotation files when searching for off-targets.
-License: GNU General Public License
-Encoding: UTF-8
+Description: Designs guide RNA for CRISPR/CAS9 genome editing and provides 
+    information on sgRNA sequence features pertinent to guide efficiency. 
+    Sequence features include GC content, presence of homopolymers, regions 
+    of self complementarity, potential off-target hits, and a predicted
+    efficiency score based on the model described in Doench et al. (2016) 
+    <doi:10.1038/nbt.3437>. Users are able to import genomes and genome 
+    annotation files to use when searching and annotating off-target hits. 
+    All sgRNA and off-target data can be generated through the R console 
+    with sgRNA_Design() or through crispRdesignR's user interface with 
+    crispRdesignRUI().
+URL: <https://github.com/dylanbeeber/crispRdesignR>
+License: GPL-3
 Depends: R (>= 2.10)
 Imports:
     Biostrings,
