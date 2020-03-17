@@ -1,6 +1,5 @@
 # crispRdesignR
 [![Build Status](https://travis-ci.com/dylanbeeber/crispRdesignR.svg?branch=master)](https://travis-ci.com/dylanbeeber/crispRdesignR)
-![crispRdesignRscreenshot4](https://user-images.githubusercontent.com/38253997/76813540-b40e9580-67ce-11ea-93c5-58f939ed6161.PNG)
 
 Software used to design guide RNA sequences for CRISPR/Cas9 genome editing
 
