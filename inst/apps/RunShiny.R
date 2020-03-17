@@ -158,7 +158,16 @@ server <- function(input, output) {
               Homopolymerdetect_color[H] <- paste('<span style="color:red">', Homopolymerdetect[H], '<span>', sep = "")
             }
           }
-          proc_sgRNA_data <- data.frame(int_sgRNA_data[1:5], GCinstance_color, Homopolymerdetect_color, int_sgRNA_data[8:15])
+          ## Adds color to indicate Self-Complementarity
+          Self_comp_list <- unlist(int_sgRNA_data[8])
+          Self_comp_index <- which(Self_comp_list > 0)
+          Self_comp_list_color <- as.character(Self_comp_list)
+          for (C in 1:length(Self_comp_list)){
+            if (C %in% Self_comp_index){
+              Self_comp_list_color[C] <- paste('<span style="color:red">', Self_comp_list_color[C], '<span>', sep = "")
+            }
+          }
+          proc_sgRNA_data <- data.frame(int_sgRNA_data[1:5], GCinstance_color, Homopolymerdetect_color, Self_comp_list_color, int_sgRNA_data[9:15])
           colnames(int_sgRNA_data) <- c("sgRNA sequence", "PAM", "Strand", "Start", "End", "GC content",
                                         "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Note Codes")
           colnames(proc_sgRNA_data) <- c("sgRNA sequence", "PAM", "Strand", "Start", "End", "GC %",
