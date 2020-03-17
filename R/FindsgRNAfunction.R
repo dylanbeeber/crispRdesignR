@@ -23,7 +23,6 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
   ## Create an empty list for the reverse sgRNA to go
   sgRNA_list_r <- c()
   ## Create four empty lists for forward and reverse start and end positions
-  ## Check to make the start and end numbers are correct
   sgRNA_f_start <- c()
   sgRNA_f_end <- c()
   sgRNA_r_start <- c()
@@ -44,7 +43,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
   lengthpostPAM <- (6 - lengthPAM)
   PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
   ## Searches all 23 nt streches in the sequence for
-  ## possible matches to the PAM, then puts entire 30 nt
+  ## possible matches to the PAM, then puts all 30 nt
   ## matches into a list (including the PAM)
   for (x in 1:num_char_in_seq){
     poss_sgRNA <- substr(sequence, x, 29+x)
@@ -131,8 +130,9 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
           individ_comp_list[[length(individ_comp_list)+1]] <- 0
         }
       }
-      self_comp_list[[length(self_comp_list)+1]] <- sum(individ_comp_list)
-    } ## Self Complementary check done
+      self_comp_list[[length(self_comp_list)+1]] <- sum(as.numeric(individ_comp_list))
+    }
+    ## Self Complementary check done
     ## Assign a study-based efficiency score based on the Doench 2016 paper and data
     ## Efficiency Score
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
@@ -398,7 +398,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
       ## Decides whether to annotate off-target sequnces or not based on user set parameters
       if (((sum(mm0_list) + sum(mm1_list) + sum(mm2_list) + sum(mm3_list)) == 0) || (annotateoffs == "no_annotate")) {
         designprogress$inc(amount = 1/10, message = "Compiling Data")
-        all_offtarget_info <- data.frame("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA")
+        all_offtarget_info <- data.frame(off_sgRNAseq, off_chr, off_start, off_end, off_mismatch, off_direction, CFD_Scores, off_offseq, "NA", "NA", "NA", "NA")
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Score", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
         ## Put lists in data frame
         sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)

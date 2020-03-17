@@ -19,7 +19,7 @@ Doench_2016_processing <- function(seqlist) {
   split_names <- c()
   for (x in 1:30) {
     split_name <- paste("snt_", x, sep = "")
-    split_names[[length(split_names)+1]] <- split_name
+    split_names[length(split_names)+1] <- split_name
   }
   colnames(split_sgRNA_df) <- split_names
   ## vtreat method of one hot encoding
@@ -30,26 +30,26 @@ Doench_2016_processing <- function(seqlist) {
   for (y in 1:30) {
     for (z in 1:4) {
       ohe_split_name <- paste("snt_", y, "_lev_x_", nuc_list[z], sep = "")
-      ohe_split_names[[length(ohe_split_names)+1]] <- ohe_split_name
+      ohe_split_names[length(ohe_split_names)+1] <- ohe_split_name
     }
   }
+  ohe_split_names <- as.vector(ohe_split_names)
   ohe_split_sgRNA_df <- ohe_split_sgRNA_df[ohe_split_names]
   ohe_split_sgRNA_df <- ohe_split_sgRNA_df[-c((nrow(ohe_split_sgRNA_df)-3):nrow(ohe_split_sgRNA_df)), ]
   ## End of single nucleotide feature data frame creation
 
   ## Get dinucleotide position features
   ## Splits each sgRNA into dinucleotides and adds them to a data frame
-  for (x in 1:length(seqlist)) {
+  di_split_sgRNA_df <- data.frame()
+  for (c in 1:length(seqlist)) {
     di_split_sgRNA <- c()
     di_split_sgRNA_list <- c()
     for (x in 1:29){
-      di_sgRNA <- substr(seqlist, x, 1+x)
-      di_split_sgRNA[[length(di_split_sgRNA)+1]] <- di_sgRNA
+      di_sgRNA <- substr(seqlist[c], x, 1+x)
+      di_split_sgRNA[length(di_split_sgRNA)+1] <- di_sgRNA
     }
-    di_split_sgRNA_df <- data.frame(di_split_sgRNA)
-    if (length(seqlist) == 1) {
-      di_split_sgRNA_df <- t(di_split_sgRNA_df)
-    }
+    temp_di_split_df <- t(as.data.frame(di_split_sgRNA))
+    di_split_sgRNA_df <- rbind(di_split_sgRNA_df, temp_di_split_df)
   }
   colnames(di_split_sgRNA_df) <- c(1:29)
   di_nuc_list <- c("AA", "AC", "AG", "AT", "CA", "CC", "CG", "CT", "GA", "GC", "GG", "GT", "TA", "TC", "TG", "TT")
@@ -58,14 +58,13 @@ Doench_2016_processing <- function(seqlist) {
     colnames(ref_di) <- c(1:29)
     di_split_sgRNA_df <- rbind(di_split_sgRNA_df, ref_di)
   }
-  ## Getting list of names for split_sgRNA_df and applying it
+  ## Getting list of names for di_split_sgRNA_df and applying it
   di_split_names <- c()
   for (x in 1:29) {
     di_split_name <- paste("dnt_", x, sep = "")
-    di_split_names[[length(di_split_names)+1]] <- di_split_name
+    di_split_names[length(di_split_names)+1] <- di_split_name
   }
   colnames(di_split_sgRNA_df) <- di_split_names
-  di_split_sgRNA_df <- as.data.frame(di_split_sgRNA_df)
   ## vtreat method of one hot encoding
   di_split_sgRNA_tplan <- vtreat::designTreatmentsZ(di_split_sgRNA_df, di_split_names, minFraction= 0, verbose=FALSE)
   ohe_di_split_sgRNA_df <- vtreat::prepare(di_split_sgRNA_tplan, di_split_sgRNA_df)
@@ -74,7 +73,7 @@ Doench_2016_processing <- function(seqlist) {
   for (y in 1:29) {
     for (z in 1:16) {
       ohe_di_split_name <- paste("dnt_", y, "_lev_x_", di_nuc_list[z], sep = "")
-      ohe_di_split_names[[length(ohe_di_split_names)+1]] <- ohe_di_split_name
+      ohe_di_split_names[length(ohe_di_split_names)+1] <- ohe_di_split_name
     }
   }
   ohe_di_split_sgRNA_df <- ohe_di_split_sgRNA_df[ohe_di_split_names]
@@ -88,10 +87,10 @@ Doench_2016_processing <- function(seqlist) {
   G_count <- c()
   T_count <- c()
   for (x in 1:length(seqlist)) {
-    A_count[[length(A_count)+1]] <- stringr::str_count(seqlist[x], "A")
-    C_count[[length(C_count)+1]] <- stringr::str_count(seqlist[x], "C")
-    G_count[[length(G_count)+1]] <- stringr::str_count(seqlist[x], "G")
-    T_count[[length(T_count)+1]] <- stringr::str_count(seqlist[x], "T")
+    A_count[length(A_count)+1] <- stringr::str_count(seqlist[x], "A")
+    C_count[length(C_count)+1] <- stringr::str_count(seqlist[x], "C")
+    G_count[length(G_count)+1] <- stringr::str_count(seqlist[x], "G")
+    T_count[length(T_count)+1] <- stringr::str_count(seqlist[x], "T")
   }
   single_nuc_count_frame <- data.frame(A_count, C_count, G_count, T_count)
   ## End of position independent single nucleotide features
@@ -114,22 +113,22 @@ Doench_2016_processing <- function(seqlist) {
   TG_count <- c()
   TT_count <- c()
   for (x in 1:nrow(di_split_sgRNA_df)) {
-    AA_count[[length(AA_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "AA"))
-    AC_count[[length(AC_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "AC"))
-    AG_count[[length(AG_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "AG"))
-    AT_count[[length(AT_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "AT"))
-    CA_count[[length(CA_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "CA"))
-    CC_count[[length(CC_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "CC"))
-    CG_count[[length(CG_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "CG"))
-    CT_count[[length(CT_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "CT"))
-    GA_count[[length(GA_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "GA"))
-    GC_count[[length(GC_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "GC"))
-    GG_count[[length(GG_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "GG"))
-    GT_count[[length(GT_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "GT"))
-    TA_count[[length(TA_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "TA"))
-    TC_count[[length(TC_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "TG"))
-    TG_count[[length(TG_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "TC"))
-    TT_count[[length(TT_count)+1]] <- length(which(di_split_sgRNA_df[x,] == "TT"))
+    AA_count[length(AA_count)+1] <- length(which(di_split_sgRNA_df[x,] == "AA"))
+    AC_count[length(AC_count)+1] <- length(which(di_split_sgRNA_df[x,] == "AC"))
+    AG_count[length(AG_count)+1] <- length(which(di_split_sgRNA_df[x,] == "AG"))
+    AT_count[length(AT_count)+1] <- length(which(di_split_sgRNA_df[x,] == "AT"))
+    CA_count[length(CA_count)+1] <- length(which(di_split_sgRNA_df[x,] == "CA"))
+    CC_count[length(CC_count)+1] <- length(which(di_split_sgRNA_df[x,] == "CC"))
+    CG_count[length(CG_count)+1] <- length(which(di_split_sgRNA_df[x,] == "CG"))
+    CT_count[length(CT_count)+1] <- length(which(di_split_sgRNA_df[x,] == "CT"))
+    GA_count[length(GA_count)+1] <- length(which(di_split_sgRNA_df[x,] == "GA"))
+    GC_count[length(GC_count)+1] <- length(which(di_split_sgRNA_df[x,] == "GC"))
+    GG_count[length(GG_count)+1] <- length(which(di_split_sgRNA_df[x,] == "GG"))
+    GT_count[length(GT_count)+1] <- length(which(di_split_sgRNA_df[x,] == "GT"))
+    TA_count[length(TA_count)+1] <- length(which(di_split_sgRNA_df[x,] == "TA"))
+    TC_count[length(TC_count)+1] <- length(which(di_split_sgRNA_df[x,] == "TG"))
+    TG_count[length(TG_count)+1] <- length(which(di_split_sgRNA_df[x,] == "TC"))
+    TT_count[length(TT_count)+1] <- length(which(di_split_sgRNA_df[x,] == "TT"))
   }
   di_nuc_count_frame <- data.frame(AA_count, AC_count, AG_count, AT_count,
                                    CA_count, CC_count, CG_count, CT_count,
@@ -145,16 +144,16 @@ Doench_2016_processing <- function(seqlist) {
   GC_content_lss_10 <- c()
   for (x in 1:length(seqlist)) {
     sgRNA_20mer <- substr(seqlist[x], 5, 24)
-    GC_content[[length(GC_content)+1]] <- (stringr::str_count(sgRNA_20mer, "G") + stringr::str_count(sgRNA_20mer, "C"))
+    GC_content[length(GC_content)+1] <- (stringr::str_count(sgRNA_20mer, "G") + stringr::str_count(sgRNA_20mer, "C"))
     if (GC_content[x] > 10) {
-      GC_content_grt_10[[length(GC_content_grt_10)+1]] <- 1
+      GC_content_grt_10[length(GC_content_grt_10)+1] <- 1
     } else {
-      GC_content_grt_10[[length(GC_content_grt_10)+1]] <- 0
+      GC_content_grt_10[length(GC_content_grt_10)+1] <- 0
     }
     if (GC_content[x] < 10) {
-      GC_content_lss_10[[length(GC_content_lss_10)+1]] <- 1
+      GC_content_lss_10[length(GC_content_lss_10)+1] <- 1
     } else {
-      GC_content_lss_10[[length(GC_content_lss_10)+1]] <- 0
+      GC_content_lss_10[length(GC_content_lss_10)+1] <- 0
     }
   }
   GC_count_frame <- data.frame(GC_content, GC_content_grt_10, GC_content_lss_10)
@@ -163,7 +162,7 @@ Doench_2016_processing <- function(seqlist) {
   ## Get features for the two nucleotides surrounding the PAM
   PAM_neighbor <- c()
   for (x in 1:length(seqlist)) {
-    PAM_neighbor[[length(PAM_neighbor)+1]] <- paste(substr(seqlist[x], 25, 25), substr(seqlist[x], 28, 28), sep = "")
+    PAM_neighbor[length(PAM_neighbor)+1] <- paste(substr(seqlist[x], 25, 25), substr(seqlist[x], 28, 28), sep = "")
   }
   PAM_neighbor <- c(PAM_neighbor, di_nuc_list)
   ## Put list into a data frame
@@ -175,7 +174,7 @@ Doench_2016_processing <- function(seqlist) {
   ohe_PAM_neighbor_names <- c()
   for (z in 1:16) {
     ohe_PAM_neighbor_name <- paste("PAM_neighbor_lev_x_", di_nuc_list[z], sep = "")
-    ohe_PAM_neighbor_names[[length(ohe_PAM_neighbor_names)+1]] <- ohe_PAM_neighbor_name
+    ohe_PAM_neighbor_names[length(ohe_PAM_neighbor_names)+1] <- ohe_PAM_neighbor_name
   }
   ohe_PAM_neighbor_df <- ohe_PAM_neighbor_df[ohe_PAM_neighbor_names]
   ohe_PAM_neighbor_df <- ohe_PAM_neighbor_df[-c((nrow(ohe_PAM_neighbor_df)-15):nrow(ohe_PAM_neighbor_df)), ]
@@ -190,20 +189,20 @@ Doench_2016_processing <- function(seqlist) {
     delta_s <- c()
     ## Assigns starting values for terminal A/T and G/C
     if ((substr(seq, 1, 1) == "G") || (substr(seq, 1, 1) == "C")) {
-      delta_h[[length(delta_h)+1]] <- -0.1
-      delta_s[[length(delta_s)+1]] <- 2.8
+      delta_h[length(delta_h)+1] <- -0.1
+      delta_s[length(delta_s)+1] <- 2.8
     }
     if ((substr(seq, 1, 1) == "A") || (substr(seq, 1, 1) == "T")) {
-      delta_h[[length(delta_h)+1]] <- -2.3
-      delta_s[[length(delta_s)+1]] <- -4.1
+      delta_h[length(delta_h)+1] <- -2.3
+      delta_s[length(delta_s)+1] <- -4.1
     }
     if ((substr(seq, nchar(seq), nchar(seq)) == "G") || (substr(seq, nchar(seq), nchar(seq)) == "C")) {
-      delta_h[[length(delta_h)+1]] <- -0.1
-      delta_s[[length(delta_s)+1]] <- 2.8
+      delta_h[length(delta_h)+1] <- -0.1
+      delta_s[length(delta_s)+1] <- 2.8
     }
     if ((substr(seq, nchar(seq), nchar(seq)) == "A") || (substr(seq, nchar(seq), nchar(seq)) == "T")) {
-      delta_h[[length(delta_h)+1]] <- -2.3
-      delta_s[[length(delta_s)+1]] <- -4.1
+      delta_h[length(delta_h)+1] <- -2.3
+      delta_s[length(delta_s)+1] <- -4.1
     }
     R <- 1.987 # Universal gas constant in Cal/degrees C*Mol
     dnac <- 50 # Dna concentration
@@ -215,8 +214,8 @@ Doench_2016_processing <- function(seqlist) {
     for (x in 1:length(di_nuc_list)){
       NN_count <- Biostrings::countPattern(di_nuc_list[x], Bioseq)
       if (NN_count != 0) {
-        delta_h[[length(delta_h)+1]] <- NN_count * NN_delta_h[x]
-        delta_s[[length(delta_s)+1]] <- NN_count * NN_delta_s[x]
+        delta_h[length(delta_h)+1] <- NN_count * NN_delta_h[x]
+        delta_s[length(delta_s)+1] <- NN_count * NN_delta_s[x]
       }
     }
     # Melting temperature calculations
@@ -230,9 +229,9 @@ Doench_2016_processing <- function(seqlist) {
   seqlist12_19 <- c()
   seqlist7_11 <- c()
   for (x in 1:length(seqlist)) {
-    seqlist20_24[[length(seqlist20_24)+1]] <- substr(seqlist[x], 20, 24)
-    seqlist12_19[[length(seqlist12_19)+1]] <- substr(seqlist[x], 12, 19)
-    seqlist7_11[[length(seqlist7_11)+1]] <- substr(seqlist[x], 7, 11)
+    seqlist20_24[length(seqlist20_24)+1] <- substr(seqlist[x], 20, 24)
+    seqlist12_19[length(seqlist12_19)+1] <- substr(seqlist[x], 12, 19)
+    seqlist7_11[length(seqlist7_11)+1] <- substr(seqlist[x], 7, 11)
   }
   # Uses function to create four lists of the Tm for each region of the thermodynamic features
   Tm <- unlist(lapply(seqlist, NN_Thermo))

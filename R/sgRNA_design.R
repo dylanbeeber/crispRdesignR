@@ -146,7 +146,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
           individ_comp_list[[length(individ_comp_list)+1]] <- 0
         }
       }
-      self_comp_list[[length(self_comp_list)+1]] <- sum(individ_comp_list)
+      self_comp_list[[length(self_comp_list)+1]] <- sum(as.numeric(individ_comp_list))
     } ## Self comp checking ends here
     ## Efficiency Score
     processed_efficiency_data <- Doench_2016_processing(sgRNA_list)
@@ -409,7 +409,10 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
         ## Set the names of each column
         colnames(sgRNA_data) <- c("sgRNA sequence", "PAM sequence", "Direction", "Start", "End", "GC content", "Homopolymer", "Self Complementary", "Efficiency Score", "MM0", "MM1", "MM2", "MM3", "MM4", "Notes")
         sgRNA_data <- sgRNA_data[order(-sgRNA_data$`Efficiency Score`),]
-        sgRNA_data
+        all_offtarget_info <- data.frame(off_sgRNAseq, off_chr, off_start, off_end, off_mismatch, off_direction, CFD_Scores, off_offseq, "NA", "NA", "NA", "NA")
+        colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Score", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
+        data_list <- c("sgRNA_data" = sgRNA_data, "all_offtarget_info" = all_offtarget_info)
+        data_list
       } else {
         ## Creates a function that annotates the off-targets called above
         annotate_genome <- function(ochr, ostart, oend, odir, gtfname) {
