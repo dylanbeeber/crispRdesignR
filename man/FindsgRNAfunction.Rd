@@ -29,6 +29,9 @@ designprogress, userPAM, calloffs, annotateoffs)
   \item{annotateoffs}{If TRUE, the function will provide annotations for the off-targets called using the genome annotation file specified by the gtfname argument. If FALSE, off-target annotation will be skipped.
   }
 }
+\value{
+A list containing all data on the generated sgRNA and all off-target information. List items 1 through 15 include information on each individual sgRNA, including the sgRNA sequence itself, PAM, location, direction relative to the target sequence, GC content, homopolymer presence, presence of self-complementarity, off-target matches, predicted efficiency score, and a notes column that summarizes unfavorable sequence features. List items 16 through 27 include all information on off-target matches, including the original sgRNA sequence, off-target sequence, chromosome, location, direction relative to the target sequence, number of mismatches, gene ID, gene name, type of DNA, and exon number.
+}
 \author{
 Dylan Beeber
 }

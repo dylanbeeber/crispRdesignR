@@ -23,6 +23,9 @@ sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoff
   \item{annotateoffs}{If TRUE, the function will provide annotations for the off-targets called using the genome annotation file specified by the gtfname argument. If FALSE, off-target annotation will be skipped.
   }
 }
+\value{
+A list containing all data on the generated sgRNA and all off-target information. List items 1 through 15 include information on each individual sgRNA, including the sgRNA sequence itself, PAM, location, direction relative to the target sequence, GC content, homopolymer presence, presence of self-complementarity, off-target matches, predicted efficiency score, and a notes column that summarizes unfavorable sequence features. List items 16 through 27 include all information on off-target matches, including the original sgRNA sequence, off-target sequence, chromosome, location, direction relative to the target sequence, number of mismatches, gene ID, gene name, type of DNA, and exon number.
+}
 \details{
 Important Note: When designing sgRNA for large genomes (billions of base pairs), use short query DNA sequences (under 500 bp). Depending on your hardware checking for off-targets can be quite computationally intensive and may take several hours if not limited to smaller query sequences.
 }
@@ -30,9 +33,15 @@ Important Note: When designing sgRNA for large genomes (billions of base pairs),
 Dylan Beeber
 }
 \examples{
+## Quick example without off-target searching or annotation
+testseq <- "GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG"
+usergenome <- "placeholder"
+gtfname <- "placeholder"
+alldata <- sgRNA_design(testseq, usergenome, gtfname, calloffs = FALSE)
+
+\donttest{
 ## Designing guide RNA for a target region as a test string, using
 ## the Saccharomyces Cerevisiae genome and genome annotation file:
-
 testseq <- "GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG"
 usergenome <- BSgenome.Scerevisiae.UCSC.sacCer2::BSgenome.Scerevisiae.UCSC.sacCer2
 gtfname <- "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz"
@@ -42,7 +51,7 @@ alldata <- sgRNA_design(testseq, usergenome, annotation_file)
 ## Designing guide RNA for a target region as a text file, using
 ## the Saccharomyces Cerevisiae genome and genome annotation file,
 ## while switching genome annotation off:
-
-#testseq <- system.file("example_data", "ExampleDAK1seq.txt", package = "crispRdesignR")
-#alldata2 <- sgRNA_design(testseq, usergenome, annotation_file, annotateoffs = FALSE)
+testseq <- system.file("example_data", "ExampleDAK1seq.txt", package = "crispRdesignR")
+alldata2 <- sgRNA_design(testseq, usergenome, annotation_file, annotateoffs = FALSE)
+}
 }

@@ -7,6 +7,9 @@ Activates the shiny UI for the crispRdesignR package
 \usage{
 crispRdesignRUI()
 }
+\value{
+No return value, called to initiate user interface.
+}
 \author{
 Dylan Beeber
 }
