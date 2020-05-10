@@ -31,7 +31,8 @@ Imports:
     stringr,
     vtreat,
     shiny,
-    DT,
+    DT
+Suggests:
     BSgenome.Scerevisiae.UCSC.sacCer2
 LazyData: true
 RoxygenNote: 7.1.0
