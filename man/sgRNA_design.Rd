@@ -42,6 +42,7 @@ alldata <- sgRNA_design(testseq, usergenome, gtfname, calloffs = FALSE)
 \donttest{
 ## Designing guide RNA for a target region as a test string, using
 ## the Saccharomyces Cerevisiae genome and genome annotation file:
+requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer2", quietly = TRUE)
 testseq <- "GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG"
 usergenome <- BSgenome.Scerevisiae.UCSC.sacCer2::BSgenome.Scerevisiae.UCSC.sacCer2
 gtfname <- "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz"

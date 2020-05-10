@@ -31,6 +31,7 @@ final_data <- getsgRNAdata(alldata)
 \donttest{
 ## Longer example with off-target searching and annotation
 ## First generate data with the sgRNA_Design Function
+requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer2", quietly = TRUE)
 testseq <- "GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG"
 usergenome <- BSgenome.Scerevisiae.UCSC.sacCer2::BSgenome.Scerevisiae.UCSC.sacCer2
 gtfname <- "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz"

@@ -14,6 +14,9 @@ No return value, called to initiate user interface.
 Dylan Beeber
 }
 \examples{
+requireNamespace("gbm", quietly = TRUE)
+requireNamespace("Biostrings", quietly = TRUE)
+requireNamespace("stringr", quietly = TRUE)
 if (interactive()) {
   crispRdesignRUI()
   }
