@@ -5,7 +5,12 @@
 Activates the shiny UI for the crispRdesignR package
 }
 \usage{
-crispRdesignRUI()
+crispRdesignRUI(max_gtf_size = 150)
+}
+\arguments{
+  \item{max_gtf_size}{
+    The maximum size (in MB) of the geneome annotation file (.gtf) that can be used with the shiny App. By default this is set to 150.
+  }
 }
 \value{
 No return value, called to initiate user interface.
@@ -16,7 +21,6 @@ Dylan Beeber
 \examples{
 requireNamespace("gbm", quietly = TRUE)
 requireNamespace("Biostrings", quietly = TRUE)
-requireNamespace("stringr", quietly = TRUE)
 if (interactive()) {
   crispRdesignRUI()
   }

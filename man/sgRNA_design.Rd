@@ -10,7 +10,7 @@ sgRNA_design(userseq, genomename, gtfname, userPAM, calloffs = TRUE, annotateoff
 \arguments{
   \item{userseq}{
     The target sequence to generate sgRNA guides for. Can either be a character sequence containing DNA bases or the name of a fasta file in the working directory.
-}
+  }
   \item{genomename}{
     The name of a geneome (from the BSgenome package) to check off-targets for.
   }
