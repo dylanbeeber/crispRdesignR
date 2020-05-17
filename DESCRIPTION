@@ -1,21 +1,23 @@
 Package: crispRdesignR
 Type: Package
-Title: Guide RNA Design for CRISPR/Cas9
-Version: 1.1.4
+Title: Guide Sequence Design for CRISPR/Cas9
+Version: 1.1.5
 Encoding: UTF-8
 Authors@R: c(
     person("Dylan", "Beeber", email = "dylan.beeber@gmail.com", role = c("aut", "cre")),
     person("Frederic", "Chain", role = "aut"))
-Description: Designs guide RNA for CRISPR/Cas9 DNA editing and provides 
-    information on sequence features pertinent to guide efficiency. 
-    Sequence features include annotated off-target predictions in a
-    user-selected genome and a predicted efficiency score based on the 
-    model described in Doench et al. (2016) <doi:10.1038/nbt.3437>. 
-    Users are able to import additional genomes and genome annotation 
-    files to use when searching and annotating off-target hits. All 
-    guide RNA and off-target data can be generated through the R console 
-    with sgRNA_Design() or through 'crispRdesignR's' user interface with 
-    crispRdesignRUI().
+Description: Designs guide sequences for CRISPR/Cas9 genome editing and 
+    provides information on sequence features pertinent to guide 
+    efficiency. Sequence features include annotated off-target 
+    predictions in a user-selected genome and a predicted efficiency 
+    score based on the model described in Doench et al. (2016) 
+    <doi:10.1038/nbt.3437>. Users are able to import additional genomes 
+    and genome annotation files to use when searching and annotating 
+    off-target hits. All guide sequences and off-target data can be 
+    generated through the 'R' console with sgRNA_Design() or through 
+    'crispRdesignR's' user interface with crispRdesignRUI(). CRISPR 
+    (Clustered Regularly Interspaced Short Palindromic Repeats) and the 
+    associated protein Cas9 refer to a technique used in genome editing.
 URL: <https://github.com/dylanbeeber/crispRdesignR>
 License: GPL-3
 Depends: R (>= 2.10)
