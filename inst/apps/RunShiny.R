@@ -44,9 +44,6 @@ ui <- fluidPage(
                         )
 
 server <- function(input, output) {
-  ## Increases the maximum file size that can be uploaded to Shiny to accomadate .gtf files
-  options(shiny.maxRequestSize=150*1024^2)
-
   ## Creates a list of reactive values that allows the program to
   ## update only when the action button is pressed
   maindf <- reactiveValues(data = NULL)
