@@ -24,7 +24,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     sequence <- stringr::str_replace_all(sequence, stringr::fixed(" "), "")
     Biostrings_sequence <- Biostrings::DNAString(sequence)
   }
-  print("Searching sequence for possible target sites")
+  message("Searching sequence for possible target sites")
   ## Creates a character string that contains the
   ## complementary sequence (Both in the reverse
   ## direction and with substituted nucleotides)
@@ -50,7 +50,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
   ## are used for study-based scoring
   setPAM <- userPAM
   if (setPAM != "NGG") {
-    print("Warning: Doench efficiency scores are only accurate for NGG PAMs")
+    message("Warning: Doench efficiency scores are only accurate for NGG PAMs")
   }
   revsetPAM <- Biostrings::reverseComplement(Biostrings::DNAString(userPAM))
   lengthPAM <- nchar(setPAM)
@@ -223,7 +223,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       rev_PAM_test_list <- c("CC", "CT", "CG", "TC", "GC", "AC", "CA")
       for (seqname in seqnames) {
         subject <- usegenome[[seqname]]
-        print(paste("Checking for Off-Targets in", seqname, sep = " "))
+        message(paste("Checking for Off-Targets in", seqname, sep = " "))
         chrmm0_list <- c()
         chrmm1_list <- c()
         chrmm2_list <- c()
@@ -360,7 +360,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
         }
       }
       ## Calculates off-target scores for each off target sequence
-      print("annotating off-targets")
+      message("Annotating off-targets")
       off_model_PAMs <- c("AG", "CG", "GA", "GC", "GT", "TG")
       CFD_PAM_Scores <- data.frame(off_model_PAMs, c(0.259259, 0.107142, 0.069444, 0.022222, 0.016129, 0.038961))
       CFD_Scores <- c()
