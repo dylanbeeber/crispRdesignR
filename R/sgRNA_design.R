@@ -346,6 +346,8 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
           }
         }
         if (is.null(mm0_list)) {
+          print(chrmm0_list)
+          print(revchrmm0_list)
           mm0_list <- chrmm0_list + revchrmm0_list
           mm1_list <- chrmm1_list + revchrmm1_list
           mm2_list <- chrmm2_list + revchrmm2_list
