@@ -1,15 +1,21 @@
 # crispRdesignR
+<!-- badges: start -->
 [![Build Status](https://travis-ci.com/dylanbeeber/crispRdesignR.svg?branch=master)](https://travis-ci.com/dylanbeeber/crispRdesignR)
+[![](https://www.r-pkg.org/badges/version/crispRdesignR?color=blue)](https://cran.r-project.org/package=crispRdesignR)
+[![](https://img.shields.io/badge/doi-10.7150/jgen.41196-yellow.svg)](https://doi.org/10.7150/jgen.41196)
+<!-- badges: end -->
 
 Software used to design guide RNA sequences for CRISPR/Cas9 genome editing
 
 This package aims to provide scientifically pertinent information when designing guide RNA sequences for Cas9 genome editing. When provided a target DNA sequence for editing, a genome to check for off-targets in, and a genome annotation file (.gtf), it will output information for two separate data tables. The first table contains information on the generated sgRNA (sgRNA sequence, PAM, Direction, Start, End, GC content, Presence of Homopolymers, Regions of Self Complementarity, Effciency Score (Doench 2016), Number of Potential Off-Target sequences, and Notes on the sgRNA). The second table contains information on the found off-target sequences (Original sgRNA Sequence, Chromosome, Start, End, Number of Mismatches, Direction, CFD Scores, Matched Sequence, Gene ID, Gene Name, Sequence Type, and Exon Number). This data can be generated through the command line or through crispRdesignR's GUI. Additionally, a user may provide their own DNA libraries and genome annotation files when searching for off-targets.
 
+For more information, please see our article in the Journal of Genomics: http://www.jgenomics.com/v08p0062.htm
+
 ![crispRdesignRscreenshot4](https://user-images.githubusercontent.com/38253997/76813540-b40e9580-67ce-11ea-93c5-58f939ed6161.PNG)
 
 ## Installation and dependencies (tested in R version 3.6.2):
 
-##### Install crispRdesignR through CRAN
+##### Install crispRdesignR 1.1.5 through CRAN
 
 `install.packages("crispRdesignR")`
 
