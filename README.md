@@ -9,9 +9,9 @@ This package aims to provide scientifically pertinent information when designing
 
 ## Installation and dependencies (tested in R version 3.6.2):
 
-##### Install crispRdesignR, where "path_to_directory" is the path of the decompressed crispRdesignR-master folder
+##### Install crispRdesignR through CRAN
 
-`install.packages(path_to_directory, repos = NULL, type="source")`
+`install.packages("crispRdesignR")`
 
 ## Quick start with the GUI
 
