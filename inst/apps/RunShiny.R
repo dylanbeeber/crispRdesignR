@@ -1,5 +1,19 @@
 ## Code for the User Interface through Shiny
 
+installed_genomes <- BSgenome::installed.genomes()
+installed_genomes_names <- c()
+if (length(installed_genomes) == 0) {
+  installed_genomes[length(installed_genomes)+1] <- "no_genomes_installed"
+  installed_genomes_names[length(installed_genomes_names)+1] <- "No genomes installed"
+  names(installed_genomes) <- installed_genomes_names
+} else {
+  for (i in 1:length(installed_genomes)) {
+    genome_name <- paste(BSgenome::organism(BSgenome::getBSgenome(installed_genomes[i])), " (", BSgenome::providerVersion(get(installed_genomes[i])), ")", sep="")
+    installed_genomes_names[length(installed_genomes_names)+1] <- genome_name
+  }
+  names(installed_genomes) <- installed_genomes_names
+}
+
 ui <- fluidPage(
   navbarPage("crispRdesignR",
              tabPanel("sgRNA Designer",
@@ -10,16 +24,7 @@ ui <- fluidPage(
                           checkboxInput("fasta", "Use FASTA or txt file as target sequence", value = FALSE),
                           tags$div(id = "placeholder1"),
                           selectInput("genome_select", "Select Genome",
-                                      c("Homo sapiens (UCSC.hg19)" = "BSgenome.Hsapiens.UCSC.hg19",
-                                        "Homo sapiens (UCSC.hg38)" = "BSgenome.Hsapiens.UCSC.hg38",
-                                        "Saccharomyces cerevisiae (UCSC.sacCer2)" = "BSgenome.Scerevisiae.UCSC.sacCer2",
-                                        "Mus musculus (UCSC.mm10)" = "BSgenome.Mmusculus.UCSC.mm10",
-                                        "Drosphila melanogaster (UCSC.dm6)" = "BSgenome.Dmelanogaster.UCSC.dm6",
-                                        "Pan troglodytes (UCSC.panTro5)" = "BSgenome.Ptroglodytes.UCSC.panTro5",
-                                        "Escheria coli (NCBI.20080805)" = "BSgenome.Ecoli.NCBI.20080805",
-                                        "Caenorhabditis elegans (UCSC.ce11)" = "BSgenome.Celegans.UCSC.ce11",
-                                        "Ratus norvegicus (UCSC.rn6)" = "BSgenome.Rnorvegicus.UCSC.rn6",
-                                        "Arabidopsis thaliana (TAIR.04232008)" = "BSgenome.Athaliana.TAIR.04232008")),
+                                      installed_genomes),
                           fileInput("gtf_file", "Choose genome annotation file (.gtf)",
                                     multiple = FALSE),
                           checkboxInput("options_toggle", "Additional Options", value = FALSE),
@@ -77,11 +82,19 @@ server <- function(input, output) {
         ))
       }
     }
-    ## Sets default parameteres for the sgRNA_design function
-    if (is.null(callofftargets)){
+    ## Sets default parameters for the sgRNA_design function
+    if (is.null(callofftargets)) {
       callofftargets <- "yes_off"
     }
-    if (is.null(annotateofftargets)){
+    ## Prevents off-target calling if no genomes are installed
+    if ((installed_genomes == "no_genomes_installed") & (callofftargets == "yes_off")) {
+      callofftargets <- "no_off"
+      showModal(modalDialog(
+        title = "Warning",
+        "No genomes installed, skipping off-target calling"
+      ))
+    }
+    if (is.null(annotateofftargets)) {
       annotateofftargets <- "yes_annotate"
     }
     if (input$'fasta' == TRUE) {
