@@ -33,7 +33,7 @@ Using the GUI version:
 
 - `crispRdesignRUI()`
 
-- Click on the “UseFASTA or txt file as target sequence” button and choose the DAK1.fasta or DAK1_short.txt file, or copy and paste the sequence in the box.
+- Click on the “Use FASTA or txt file as target sequence” button and choose the DAK1.fasta or DAK1_short.txt file, or copy and paste the sequence in the box.
 
 - select the Saccharomyces cerevisiae genome
 
