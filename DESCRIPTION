@@ -1,7 +1,7 @@
 Package: crispRdesignR
 Type: Package
 Title: Guide Sequence Design for CRISPR/Cas9
-Version: 1.1.5
+Version: 1.1.6
 Encoding: UTF-8
 Authors@R: c(
     person("Dylan", "Beeber", email = "dylan.beeber@gmail.com", role = c("aut", "cre")),
