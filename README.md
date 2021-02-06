@@ -15,7 +15,7 @@ For more information, please see our article in the Journal of Genomics: http://
 
 ## Installation and dependencies (tested in R version 3.6.2):
 
-##### Install crispRdesignR v1.1.5 through CRAN
+##### Install crispRdesignR v1.1.6 through CRAN
 
 `install.packages("crispRdesignR")`
 
