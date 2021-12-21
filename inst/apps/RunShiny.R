@@ -8,7 +8,7 @@ if (length(installed_genomes) == 0) {
   names(installed_genomes) <- installed_genomes_names
 } else {
   for (i in 1:length(installed_genomes)) {
-    genome_name <- paste(BSgenome::organism(BSgenome::getBSgenome(installed_genomes[i])), " (", BSgenome::providerVersion(get(installed_genomes[i])), ")", sep="")
+    genome_name <- paste(BSgenome::organism(BSgenome::getBSgenome(installed_genomes[i])), " (", metadata(get(installed_genomes[i]))$genome, ")", sep="")
     installed_genomes_names[length(installed_genomes_names)+1] <- genome_name
   }
   names(installed_genomes) <- installed_genomes_names
@@ -145,7 +145,7 @@ server <- function(input, output) {
             gene_annotation_file(rtracklater::import.gff(input$'gtf_file'$datapath))
           }
         }
-        ## Inititates sgRNA_design_function
+        ## Initiates sgRNA_design_function
         all_data <- sgRNA_design_function(userseq = sequence, genomename = input$'genome_select', gtf = gene_annotation_file(), userPAM = givenPAM, designprogress,
                                            calloffs = callofftargets, annotateoffs = annotateofftargets)
         if ((length(all_data) == 0) == FALSE) {
