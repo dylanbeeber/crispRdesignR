@@ -309,34 +309,34 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
             for (f in 1:length(mis_info)) {
               individMM[[length(individMM)+1]] <- mis_info[f]
             }
-            chrmm0_list[[length(chrmm0_list)+1]] <- sum(individMM == 0)
-            chrmm1_list[[length(chrmm1_list)+1]] <- sum(individMM == 1)
-            chrmm2_list[[length(chrmm2_list)+1]] <- sum(individMM == 2)
-            chrmm3_list[[length(chrmm3_list)+1]] <- sum(individMM == 3)
-            chrmm4_list[[length(chrmm4_list)+1]] <- sum(individMM == 4)
+            chrmm0_list[length(chrmm0_list)+1] <- sum(individMM == 0)
+            chrmm1_list[length(chrmm1_list)+1] <- sum(individMM == 1)
+            chrmm2_list[length(chrmm2_list)+1] <- sum(individMM == 2)
+            chrmm3_list[length(chrmm3_list)+1] <- sum(individMM == 3)
+            chrmm4_list[length(chrmm4_list)+1] <- sum(individMM == 4)
           } else {
-            chrmm0_list[[length(chrmm0_list)+1]] <- 0
-            chrmm1_list[[length(chrmm1_list)+1]] <- 0
-            chrmm2_list[[length(chrmm2_list)+1]] <- 0
-            chrmm3_list[[length(chrmm3_list)+1]] <- 0
-            chrmm4_list[[length(chrmm4_list)+1]] <- 0
+            chrmm0_list[length(chrmm0_list)+1] <- 0
+            chrmm1_list[length(chrmm1_list)+1] <- 0
+            chrmm2_list[length(chrmm2_list)+1] <- 0
+            chrmm3_list[length(chrmm3_list)+1] <- 0
+            chrmm4_list[length(chrmm4_list)+1] <- 0
           }
           individMM <- c()
           if (length(rev_mis_info) > 0) {
             for (f in 1:length(rev_mis_info)) {
               individMM[[length(individMM)+1]] <- rev_mis_info[f]
             }
-            revchrmm0_list[[length(revchrmm0_list)+1]] <- sum(individMM == 0)
-            revchrmm1_list[[length(revchrmm1_list)+1]] <- sum(individMM == 1)
-            revchrmm2_list[[length(revchrmm2_list)+1]] <- sum(individMM == 2)
-            revchrmm3_list[[length(revchrmm3_list)+1]] <- sum(individMM == 3)
-            revchrmm4_list[[length(revchrmm4_list)+1]] <- sum(individMM == 4)
+            revchrmm0_list[length(revchrmm0_list)+1] <- sum(individMM == 0)
+            revchrmm1_list[length(revchrmm1_list)+1] <- sum(individMM == 1)
+            revchrmm2_list[length(revchrmm2_list)+1] <- sum(individMM == 2)
+            revchrmm3_list[length(revchrmm3_list)+1] <- sum(individMM == 3)
+            revchrmm4_list[length(revchrmm4_list)+1] <- sum(individMM == 4)
           } else {
-            revchrmm0_list[[length(revchrmm0_list)+1]] <- 0
-            revchrmm1_list[[length(revchrmm1_list)+1]] <- 0
-            revchrmm2_list[[length(revchrmm2_list)+1]] <- 0
-            revchrmm3_list[[length(revchrmm3_list)+1]] <- 0
-            revchrmm4_list[[length(revchrmm4_list)+1]] <- 0
+            revchrmm0_list[length(revchrmm0_list)+1] <- 0
+            revchrmm1_list[length(revchrmm1_list)+1] <- 0
+            revchrmm2_list[length(revchrmm2_list)+1] <- 0
+            revchrmm3_list[length(revchrmm3_list)+1] <- 0
+            revchrmm4_list[length(revchrmm4_list)+1] <- 0
           }
         }
         if (is.null(mm0_list)) {
