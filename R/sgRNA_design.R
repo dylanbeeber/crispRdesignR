@@ -54,8 +54,8 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
   }
   revsetPAM <- Biostrings::reverseComplement(Biostrings::DNAString(userPAM))
   lengthPAM <- nchar(setPAM)
-  usesetPAM <- stringr::str_replace_all(setPAM, "N", ".")
-  revusesetPAM <- stringr::str_replace_all(revsetPAM, "N", ".")
+  usesetPAM <- stringr::str_replace_all(as.character(setPAM), "N", ".")
+  revusesetPAM <- stringr::str_replace_all(as.character(revsetPAM), "N", ".")
   lengthpostPAM <- (6 - lengthPAM)
   PAM <- paste("........................", usesetPAM, paste(rep(".", lengthpostPAM), sep ="", collapse =""), sep="", collapse ="")
   ## Searches all 23 nt streches in the sequence for
@@ -110,7 +110,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     ## Find GC percentage for each sgRNA and puts that data into
     ## a list called "GCinstance"
     FindGC <- function(seqlist){
-      ((stringr::str_count(seqlist, "G") + stringr::str_count(seqlist, "C")) / 20)
+      ((stringr::str_count(as.character(seqlist), "G") + stringr::str_count(as.character(seqlist), "C")) / 20)
     }
     GCinstance <- sapply(sgRNA_seq, FindGC)
     ## Find homopolmers
@@ -126,7 +126,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
     revcomp_backbone <- Biostrings::reverseComplement(backbone_area)
     ## Creates a function to detect the GC content of 4 bp regions of the sgRNA
     SpeFindGC <- function(seqlist){
-      ((stringr::str_count(seqlist, "G") + stringr::str_count(seqlist, "C")) / 4)
+      ((stringr::str_count(as.character(seqlist), "G") + stringr::str_count(as.character(seqlist), "C")) / 4)
     }
     ## Process that detects hairpins within the sgRNA or with the backbone
     for (j in 1:length(sgRNA_seq)){
@@ -368,7 +368,7 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
         if (off_direction[x] == "-") {
           temporary_off <- Biostrings::DNAString(off_offseq[x])
           temporary_off <- Biostrings::reverseComplement(temporary_off)
-          CFDoffsplit <- stringr::str_split(temporary_off, "", simplify = TRUE)
+          CFDoffsplit <- stringr::str_split(as.character(temporary_off), "", simplify = TRUE)
         } else {
           CFDoffsplit <- stringr::str_split(off_offseq[x], "", simplify = TRUE)
         }
