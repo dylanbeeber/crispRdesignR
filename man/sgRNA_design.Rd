@@ -42,9 +42,9 @@ alldata <- sgRNA_design(testseq, usergenome, gtfname, calloffs = FALSE)
 \donttest{
 ## Designing guide RNA for a target region as a test string, using
 ## the Saccharomyces Cerevisiae genome and genome annotation file:
-requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer2", quietly = TRUE)
+requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer3", quietly = TRUE)
 testseq <- "GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG"
-usergenome <- BSgenome.Scerevisiae.UCSC.sacCer2::BSgenome.Scerevisiae.UCSC.sacCer2
+usergenome <- BSgenome.Scerevisiae.UCSC.sacCer3::BSgenome.Scerevisiae.UCSC.sacCer3
 gtfname <- "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz"
 annotation_file <- system.file("example_data", gtfname, package = "crispRdesignR")
 alldata <- sgRNA_design(testseq, usergenome, annotation_file)

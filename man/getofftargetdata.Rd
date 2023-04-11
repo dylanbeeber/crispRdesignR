@@ -31,9 +31,9 @@ final_data <- getofftargetdata(alldata)
 \donttest{
 ## Longer example with off-target searching and annotation
 ## First generate data with the sgRNA_Design Function
-requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer2", quietly = TRUE)
+requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer3", quietly = TRUE)
 testseq <- "GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG"
-usergenome <- BSgenome.Scerevisiae.UCSC.sacCer2::BSgenome.Scerevisiae.UCSC.sacCer2
+usergenome <- BSgenome.Scerevisiae.UCSC.sacCer3::BSgenome.Scerevisiae.UCSC.sacCer3
 gtfname <- "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz"
 annotation_file <- system.file("example_data", gtfname, package = "crispRdesignR")
 alldata <- sgRNA_design(testseq, usergenome, annotation_file)

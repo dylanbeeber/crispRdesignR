@@ -1,7 +1,7 @@
 Package: crispRdesignR
 Type: Package
 Title: Guide Sequence Design for CRISPR/Cas9
-Version: 1.1.6
+Version: 1.1.7
 Encoding: UTF-8
 Authors@R: c(
     person("Dylan", "Beeber", email = "dylan.beeber@gmail.com", role = c("aut", "cre")),
@@ -35,6 +35,6 @@ Imports:
     shiny,
     DT
 Suggests:
-    BSgenome.Scerevisiae.UCSC.sacCer2
+    BSgenome.Scerevisiae.UCSC.sacCer3
 LazyData: true
 RoxygenNote: 7.1.0
