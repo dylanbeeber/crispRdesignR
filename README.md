@@ -1,6 +1,5 @@
 # crispRdesignR
 <!-- badges: start -->
-[![Build Status](https://www.travis-ci.com/dylanbeeber/crispRdesignR.svg?branch=master)](https://www.travis-ci.com/dylanbeeber/crispRdesignR)
 [![](https://www.r-pkg.org/badges/version/crispRdesignR?color=blue)](https://cran.r-project.org/package=crispRdesignR)
 [![](https://img.shields.io/badge/doi-10.7150/jgen.41196-yellow.svg)](https://doi.org/10.7150/jgen.41196)
 <!-- badges: end -->
