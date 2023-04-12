@@ -110,7 +110,7 @@ sgRNA_design_function <- function(userseq, genomename, gtf, designprogress, user
     revcomp_backbone <- Biostrings::reverseComplement(backbone_area)
     ## Creates a function to detect the GC content of 4 bp regions of the sgRNA
     SpeFindGC <- function(seqlist){
-      ((stringr::str_count(seqlist, "G") + stringr::str_count(seqlist, "C")) / 4)
+      ((stringr::str_count(as.character(seqlist), "G") + stringr::str_count(as.character(seqlist), "C")) / 4)
     }
     ## Process that detects hairpins within the sgRNA or with the backbone
     for (j in 1:length(sgRNA_seq)){
