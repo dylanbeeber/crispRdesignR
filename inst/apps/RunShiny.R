@@ -87,7 +87,7 @@ server <- function(input, output) {
       callofftargets <- "yes_off"
     }
     ## Prevents off-target calling if no genomes are installed
-    if ((installed_genomes == "no_genomes_installed") & (callofftargets == "yes_off")) {
+    if ((identical(installed_genomes, "no_genomes_installed")) & (callofftargets == "yes_off")) {
       callofftargets <- "no_off"
       showModal(modalDialog(
         title = "Warning",
