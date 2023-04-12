@@ -404,6 +404,8 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
       CFD_Scores <- round(CFD_Scores, digits = 3)
       ## Decides whether to annotate off_targets
       if (((sum(mm0_list) + sum(mm1_list) + sum(mm2_list) + sum(mm3_list)) == 0) || (annotateoffs == FALSE)) {
+        # Temporary fix to maintain the structure of the output data frame
+        self_comp_list <- unlist(self_comp_list)
         ## Put lists in data frame
         sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
         ## Set the names of each column
@@ -477,6 +479,8 @@ sgRNA_design <- function(userseq, genomename, gtfname, userPAM, calloffs = TRUE,
         ## Complies all extra sgRNA info into a separate data frame
         all_offtarget_info <- data.frame(off_sgRNAseq, off_chr, off_start, off_end, off_mismatch, off_direction, CFD_Scores, off_offseq, more_off_info$geneidlist, more_off_info$genenamelist, more_off_info$sequencetypelist, more_off_info$exonnumberlist)
         colnames(all_offtarget_info) <- c("sgRNA sequence", "Chromosome", "Start", "End", "Mismatches", "Direction", "CFD Scores", "Off-target sequence", "Gene ID", "Gene Name", "Sequence Type", "Exon Number")
+        # Temporary fix to maintain the structure of the output data frame
+        self_comp_list <- unlist(self_comp_list)
         ## Put lists in data frame
         sgRNA_data <- data.frame(sgRNA_seq, sgRNA_PAM, sgRNA_fow_or_rev, sgRNA_start, sgRNA_end, GCinstance, Homopolymerdetect, self_comp_list, Efficiency_Score, mm0_list, mm1_list, mm2_list, mm3_list, mm4_list, Notes)
         ## Set the names of each column
