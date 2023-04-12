@@ -12,9 +12,9 @@ For more information, please see our article in the Journal of Genomics: http://
 
 ![crispRdesignRscreenshot4](https://user-images.githubusercontent.com/38253997/76813540-b40e9580-67ce-11ea-93c5-58f939ed6161.PNG)
 
-## Installation and dependencies (tested in R version 3.6.2):
+## Installation and dependencies (tested in R version 4.2.2):
 
-##### Install crispRdesignR v1.1.6 through CRAN
+##### Install crispRdesignR v1.1.7 through CRAN
 
 `install.packages("crispRdesignR")`
 
