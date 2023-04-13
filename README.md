@@ -81,9 +81,13 @@ The additional off-target data can be retrieved with `getofftargetdata(x)`
 ###### Example:
 
 `testseq <- "GGCAGAGCTTCGTATGTCGGCGATTCATCTCAAGTAGAAGATCCTGGTGCAGTAGG"
+
 usergenome <- BSgenome.Scerevisiae.UCSC.sacCer2::BSgenome.Scerevisiae.UCSC.sacCer2
+
 gtfname <- "Saccharomyces_cerevisiae.R64-1-1.92.gtf.gz"
+
 annotation_file <- system.file("example_data", gtfname, package = "crispRdesignR")
+
 alldata <- sgRNA_design(testseq, usergenome, annotation_file)`
 
 `sgRNAdata <- getsgRNAdata(alldata)`
